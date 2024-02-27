@@ -1,0 +1,53 @@
+main {
+  text-align: left; /* Align all text to the left by default */
+  margin: 0 auto;
+}
+
+main p {
+  font-family: sans-serif;
+}
+
+main h4 {
+  font-family: sans-serif;
+}
+
+p {
+  font-size: 0.8rem;
+}
+
+.finding p {
+  font-size: 0.95rem;
+}
+
+p, h1, h2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  line-height: 1.2;
+}
+
+.container {
+  display: flex; /* Make container flexible */
+  justify-content: center; /* Horizontally center content */
+  align-items: center; /* Vertically center content */
+  width: 100%; /* Full width of viewport */
+}
+
+.centered-div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+a {
+  text-decoration: none;
+}
+
+a:link, a:visited {
+  color: #7393B3;
+}
+
+a:hover {
+  color: #95bfe9;
+  text-decoration: underline;
+}

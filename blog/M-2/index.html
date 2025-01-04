@@ -197,34 +197,59 @@
         decimal.classList.remove('show');
       }
     }
-   
-    //updateJoystickValue("thrust", 5, true); // Update thrust display
+    
+    /*async function sendCommand(command) {
+      try {
+        const response = await fetch('http://192.168.4.1', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ command: command }),
+        });
+  
+        if (response.ok) {
+          const result = await response.text();
+          console.log('Command sent successfully:', command);
+          console.log('Response:', result);
+        } else {
+          console.error('Failed to send command. Status:', response.status);
+        }
+      } catch (error) {
+        console.error('Error sending command:', error);
+      }
+    }*/
+    
+    // Example usage
+    //sendCommand('start');
 
     // Read joystick input and send to ESP32
     window.addEventListener("gamepadconnected", (event) => {
       setInterval(() => {
         const gp = navigator.getGamepads()[0];
         if (gp) {
+          // Example usage
+          //sendCommand('start');
           // Get thrust value (mapping example)
-          const thrust = Math.round((gp.axes[1] + 1) * 90);
+          var thrust = Math.round((gp.axes[2] + 1) * 50 * (-1) + 100); 
           updateJoystickValue("thrust", thrust, true); // Update thrust display
 
           // Get yaw value (mapping example)
-          const yaw = Math.round((gp.axes[0] + 1) * 90);
+          var yaw = Math.round((gp.axes[3] + 1) * 90);
           updateJoystickValue("yaw", yaw, false); // Update yaw display
 
           // Get pitch value (mapping example)
-          const pitch = Math.round((gp.axes[2] + 1) * 90);
+          var pitch = Math.round((gp.axes[1] + 1) * 90);
           updateJoystickValue("pitch", pitch, false); // Update pitch display
 
           // Get roll value (mapping example)
-          const roll = Math.round((gp.axes[3] + 1) * 90);
+          var roll = Math.round((gp.axes[0] + 1) * 90);
           updateJoystickValue("roll", roll, false); // Update roll display
 
           // Send values to ESP32 (this can be customized to send other controls)
-          fetch("http://192.168.4.1/control", {
+          fetch("http://192.168.4.1/command", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            //headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `thrust=${thrust}&yaw=${yaw}&pitch=${pitch}&roll=${roll}`
           });
         }

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Takamagahara Mission Control</title>
+  <link rel="icon" href="/images/icon.png">
+  <style>
+  /* General styles */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #212121; /* Dark grey background */
+    color: #ffffff; /* White text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align to top */
+    height: 100vh;
+    padding-top: 20px; /* Added padding for spacing */
+  }
+
+  /* Title styling */
+  h1 {
+    font-size: 2rem;
+    color: #ffffff; /* White color for title */
+    margin-bottom: 20px;
+  }
+
+  /* Video feed container */
+  #videoFeed {
+    border: 1px solid #888888; /* White border for the video feed */
+    border-radius: 10px;
+    width: 85%; /* Slightly bigger: 85% of the screen width */
+    max-width: 1000px; /* Optional: Ensure the video doesn't grow too large */
+    height: auto;
+    aspect-ratio: 16/9; /* Maintain 16:9 aspect ratio */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6); /* Darker shadow */
+    margin-bottom: 20px; /* Space below the video */
+  }
+
+  /* Control panel container */
+  .control-panel {
+    width: 80%;
+    max-width: 600px;
+    background: #333333; /* Darker background for control panel */
+    border: 2px solid #444444; /* Slightly lighter border */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Control panel headers */
+  .control-panel h2 {
+    font-size: 1.5rem;
+    color: #f9f9f9; /* Accent color */
+    margin-bottom: 10px;
+  }
+
+  /* Joystick input display */
+  .joystick-values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  /* 7-segment display styling */
+  .segment-container {
+    display: flex;
+  }
+
+  .segment {
+    width: 30px;
+    height: 50px;
+    background-color: #222222;
+    border-radius: 5px;
+    margin: 0 5px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* Create the numbers in the segment boxes */
+  .segment span {
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .decimal {
+    width: 10px;
+    height: 10px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    margin-top: 15px;
+    display: inline-block;
+    visibility: hidden;
+  }
+
+  .decimal.show {
+    visibility: visible;
+  }
+
+  .joystick-values div {
+    font-size: 1rem;
+    color: #ffffff;
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for better readability */
+  }
+
+  /* Button styles (if needed) */
+  button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #00bcd4;
+    color: white;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #008ba3; /* Darker shade on hover */
+  }
+
+  /* Responsive adjustments */
+  @media screen and (max-width: 768px) {
+    #videoFeed {
+      width: 100%;
+    }
+    .control-panel {
+      width: 90%;
+    }
+  }
+  </style>
+</head>
+<body>
+  <h1>Takamagahara <span style="color: red;">M-2</span> Mission-Control</h1>
+
+  <video id="videoFeed" autoplay></video>
+
+  <div class="control-panel">
+    <h2>Control Panel</h2>
+    <br>
+    <div class="joystick-values">
+      <div><b><span style="color: red;">Thrust: </span></b><div class="segment-container" id="thrust-value">
+        <div class="segment" id="thrust1"><span style="color: red;">0</span></div>
+        <div class="segment" id="thrust2"><span style="color: red;">0</span></div>
+        <div class="segment" id="thrust3"><span style="color: red;">0</span></div>
+        <div class="decimal" id="thrust-decimal"></div>
+      </div></div>
+
+      <div>Yaw: <div class="segment-container" id="yaw-value">
+        <div class="segment" id="yaw1"><span>0</span></div>
+        <div class="segment" id="yaw2"><span>0</span></div>
+        <div class="segment" id="yaw3"><span>0</span></div>
+        <div class="decimal" id="yaw-decimal"></div>
+      </div></div>
+
+      <div>Pitch: <div class="segment-container" id="pitch-value">
+        <div class="segment" id="pitch1"><span>0</span></div>
+        <div class="segment" id="pitch2"><span>0</span></div>
+        <div class="segment" id="pitch3"><span>0</span></div>
+        <div class="decimal" id="pitch-decimal"></div>
+      </div></div>
+
+      <div>Roll: <div class="segment-container" id="roll-value">
+        <div class="segment" id="roll1"><span>0</span></div>
+        <div class="segment" id="roll2"><span>0</span></div>
+        <div class="segment" id="roll3"><span>0</span></div>
+        <div class="decimal" id="roll-decimal"></div>
+      </div></div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch and display MJPEG video
+    document.getElementById('videoFeed').src = "http://192.168.4.1:81/stream";
+
+    // Update joystick values in 7-segment style with leading zeros
+    function updateJoystickValue(elementPrefix, value, showDecimal) {
+      const formattedValue = value.toString().padStart(3, '0'); // Ensure three digits
+
+      // Update the segments with the formatted values
+      for (let i = 0; i < 3; i++) {
+        let segmentId = `${elementPrefix}${i + 1}`;
+        let segment = document.getElementById(segmentId);
+        let span = segment.querySelector('span');
+        span.textContent = formattedValue[i]; // Display the digit
+      }
+
+      // Handle decimal point visibility
+      let decimal = document.getElementById(`${elementPrefix}-decimal`);
+      if (showDecimal) {
+        decimal.classList.add('show');
+      } else {
+        decimal.classList.remove('show');
+      }
+    }
+   
+    //updateJoystickValue("thrust", 5, true); // Update thrust display
+
+    // Read joystick input and send to ESP32
+    window.addEventListener("gamepadconnected", (event) => {
+      setInterval(() => {
+        const gp = navigator.getGamepads()[0];
+        if (gp) {
+          // Get thrust value (mapping example)
+          const thrust = Math.round((gp.axes[1] + 1) * 90);
+          updateJoystickValue("thrust", thrust, true); // Update thrust display
+
+          // Get yaw value (mapping example)
+          const yaw = Math.round((gp.axes[0] + 1) * 90);
+          updateJoystickValue("yaw", yaw, false); // Update yaw display
+
+          // Get pitch value (mapping example)
+          const pitch = Math.round((gp.axes[2] + 1) * 90);
+          updateJoystickValue("pitch", pitch, false); // Update pitch display
+
+          // Get roll value (mapping example)
+          const roll = Math.round((gp.axes[3] + 1) * 90);
+          updateJoystickValue("roll", roll, false); // Update roll display
+
+          // Send values to ESP32 (this can be customized to send other controls)
+          fetch("http://192.168.4.1/control", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `thrust=${thrust}&yaw=${yaw}&pitch=${pitch}&roll=${roll}`
+          });
+        }
+      }, 100);
+    });
+  </script>
+</body>
+</html>

@@ -303,3 +303,40 @@ body {
   color: white;
   text-shadow: 0 0 20px rgb(235, 25, 42);
 }
+
+#music-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    color: white;
+    text-align: center;
+}
+
+#music-popup button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #d52d58;
+    color: white;
+}
+
+#music-popup button:hover {
+    background: #b81b43;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.handwritten {
+    font-family: 'Indie Flower', cursive;
+    font-size: 1em;
+	color: #FFF; /* Optional: A brownish ink-like color */
+}

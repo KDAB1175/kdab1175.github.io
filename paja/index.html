@@ -6,74 +6,113 @@
     <title>Document</title>
     <link rel="stylesheet" href="style.css" />
     <link
-      href="https://fonts.googleapis.com/css?family=Indie+Flower"
+      href="https://fonts.googleapis.com/css?family=Indie+Flower&family=Patrick+Hand&display=swap"
       rel="stylesheet"
       type="text/css"
     />
   </head>
   <body>
-  <audio id="background-music" autoplay loop>
-    <source src="https://github.com/KDAB1175/kdab1175.github.io/tree/main/paja/sos-official-music-video.mp3" type="audio/mp3" />
-    Your browser does not support the audio element.
-  </audio>
+    <audio id="background-music" loop>
+        <source src="https://kdab1175.github.io/paja/sos-official-music-video.mp3" type="audio/mp3">
+    </audio>
 
-
-    <div class="container">
-      <div class="strawberry">
-		<div class="glass">
-			<div class="shine"></div>
-		</div>
-		<div class="thorns">
-			<div></div>
-		</div>
-		<div class="leaves">
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-		<div class="petals">
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-	  </div>
+    <div id="music-popup" style="display: block;">
+        <div class="popup-content">
+            <h3>Eine kleine Nachtmusik</h3>
+			<small>written by <s>Wolfgang Amadeus Mozart</s> <span class="handwritten">Albert Hajek (it is a poetic rant)</span></small>
+			<p>
+				Sedím, sedím a hlavu si lámu, <br> Google zakázal mi použít autoplay; <br> takže lásko má, teď musíš dotýkat se html buttonu, <br> prosím, prosím se stisknutím si práci dej. <br><br>
+				Kdyby sis ji totiž nedala, <br> firma jako je náš oblíbený ó korporátní overlord by zešílela. <br> Kontroluje celý search a browser, stejně tak i manufacturer von deine Handy 
+				<br> proto i Safari nechce použít autoplay, though as a solution it would come in handy <br> (to je alespom rým shaking my head) <br><br>
+				Nachtmusik je tento text díky času jeho vzniku <br> pošlu ti ho však až ráno, neb dnes ještě nemá svou velevýsostnou váhu. <br> Básníkovi je z tohto textu do vzlyku, <br> však iba dobre je že nevidal som sa na tůto dráhu. <br><br>
+				Už napíšu pouze poslední odstavec či sloku-v tom se nevyznám- <br> já chcel akorát vymyslet cestu jak být s tebou keď nucen být od tebe, <br> sám, <br> v tento den-zítra pro mne, dnes pro tebe. <br> (to je zas rým jak noha) <br>
+				Nyní už vzdám holt pouze tobě <br> jsi mým světlem v této době, <br>
+				krajinou nejkrásnějších míst <br> jak Země, nebo dokonce i Měsíc.<br>
+				<br>
+				I Love You. Wishing You a Lovely, Perfect and Amazing Valentine's 💕.
+			</p>
+            <button onclick="startEverything(true)">I press this button adhering to Google's wannabe love-destroying rules</button>
+        </div>
     </div>
-	<script>
-  function createFallingEmoji(emoji) {
-    const emojiElement = document.createElement("div");
-    emojiElement.textContent = emoji;
-    emojiElement.style.position = "fixed"; // Ensures emojis don’t shift other elements
-    emojiElement.style.top = "-50px"; 
-    emojiElement.style.left = Math.random() * 100 + "vw"; 
-    emojiElement.style.fontSize = Math.random() * 20 + 30 + "px"; 
-    emojiElement.style.opacity = Math.random() * 0.7 + 0.3; 
-    emojiElement.style.pointerEvents = "none"; // Prevents interference with clicks
-    emojiElement.style.zIndex = "-1"; // Moves them behind other elements
-    emojiElement.style.animation = "fallingAnimation " + (Math.random() * 3 + 2) + "s linear infinite"; 
-    document.body.appendChild(emojiElement);
 
-    setTimeout(() => {
-      emojiElement.remove();
-    }, 5000);
-  }
+    <div class="container hidden">
+        <div class="strawberry">
+            <div class="glass">
+                <div class="shine"></div>
+            </div>
+            <div class="thorns">
+                <div></div>
+            </div>
+            <div class="leaves">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="petals">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
 
-  function startFallingEmojis() {
-    setInterval(() => {
-      createFallingEmoji("😘");
-      createFallingEmoji("❤️");
-	  createFallingEmoji("🥰");
-    }, 300); 
-  }
+    <script>
+    function startEverything(withMusic) {
+        // Hide popup
+        document.getElementById('music-popup').style.display = 'none';
+        
+        // Show content
+        document.querySelector('.container').classList.remove('hidden');
+        
+        // Start music if user chose yes
+        if (withMusic) {
+            const audio = document.getElementById('background-music');
+            audio.volume = 0.5;
+            audio.play().catch(error => {
+                console.log("Playback failed:", error);
+            });
+        }
+        
+        // Start the emoji animation
+        startFallingEmojis();
+    }
 
-  startFallingEmojis();
-</script>
+    function createFallingEmoji(emoji) {
+        const emojiElement = document.createElement("div");
+        emojiElement.textContent = emoji;
+        emojiElement.style.position = "fixed";
+        emojiElement.style.top = "-50px"; 
+        emojiElement.style.left = Math.random() * 100 + "vw"; 
+        emojiElement.style.fontSize = Math.random() * 20 + 30 + "px"; 
+        emojiElement.style.opacity = Math.random() * 0.7 + 0.3; 
+        emojiElement.style.pointerEvents = "none";
+        emojiElement.style.zIndex = "-1";
+        emojiElement.style.animation = "fallingAnimation " + (Math.random() * 3 + 2) + "s linear infinite"; 
+        document.body.appendChild(emojiElement);
+        setTimeout(() => {
+            emojiElement.remove();
+        }, 5000);
+    }
 
+    function startFallingEmojis() {
+        setInterval(() => {
+            createFallingEmoji("😘");
+            createFallingEmoji("❤️");
+            createFallingEmoji("🥰");
+			createFallingEmoji("🌔");
+			createFallingEmoji("🌎");
+			createFallingEmoji("😘");
+            createFallingEmoji("❤️");
+            createFallingEmoji("🥰");
+        }, 300); 
+    }
+    </script>
   </body>
 </html>

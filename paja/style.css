@@ -3,7 +3,7 @@ body {
   height: 100vh;
   width: 100vw;
   background: #000;
-  overflow: hidden;
+  overflow: auto;
   display: flex; /* Center everything */
   align-items: center;
   justify-content: center;
@@ -315,7 +315,15 @@ body {
     z-index: 1000;
     color: white;
     text-align: center;
+    
+    /* Explicit height and scrollable content */
+    height: 80vh;  /* Take up 80% of the viewport height */
+    width: 90vw;   /* Adjust to your needs */
+    
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
 }
+
+
 
 #music-popup button {
     margin: 10px;

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangman Game</title>
+  <style>
+    body {
+      font-family: monospace;
+      background-color: #121212;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    #wordDisplay {
+      font-size: 2em;
+      letter-spacing: 10px;
+      margin-bottom: 20px;
+    }
+    #wrongGuesses {
+      color: #ff5555;
+      margin-bottom: 20px;
+    }
+    canvas {
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+      display: block;
+      margin: 0 auto 20px auto;
+    }
+    #keyboard button {
+      margin: 2px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #keyboard button:disabled {
+      background-color: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    p {
+      margin: 0.3em 0;
+    }
+    @media (max-width: 600px) {
+      #wordDisplay {
+        font-size: 1.5em;
+        letter-spacing: 5px;
+      }
+      #keyboard button {
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Hangman Gallows - es ist Deutsch</h1>
+  <p>Guess the word ooorrrr... I have hidden the answer in the code, so with some simple/clever reverse engineering and looking at the code you could get it too, but I will leave that to youu.</p>
+  <canvas id="hangmanDrawing" width="200" height="250"></canvas>
+  <div id="wordDisplay"></div>
+  <div id="wrongGuesses"></div>
+  <div id="keyboard"></div>
+  <button onclick="startGame()">Restart Game</button>
+  <audio id="victorySong" src="lovegame.mp3"></audio>
+
+  <script>
+    const words = ["deine"]; // solution, reseni
+    let chosenWord = "";
+    let guessedLetters = [];
+    let wrongGuesses = [];
+    const maxWrong = 11;
+
+    function startGame() {
+      chosenWord = words[Math.floor(Math.random() * words.length)];
+      guessedLetters = [];
+      wrongGuesses = [];
+      document.body.innerHTML = `
+        <h1>Hangman Gallows - es ist Deutsch</h1>
+		<p>Guess the word ooorrrr... I have hidden the answer in the code, so with some simple/clever reverse engineering and looking at the code you could get it too, but I will leave that up to youu.</p>
+        <canvas id="hangmanDrawing" width="200" height="250"></canvas>
+        <div id="wordDisplay"></div>
+        <div id="wrongGuesses"></div>
+        <div id="keyboard"></div>
+        <button onclick="startGame()">Restart Game</button>
+        <audio id="victorySong" src="lovegame.mp3"></audio>
+      `;
+      updateDisplay();
+      drawHangman();
+      generateKeyboard();
+    }
+
+    function updateDisplay() {
+      const wordDisplay = document.getElementById("wordDisplay");
+      wordDisplay.textContent = chosenWord
+        .split("")
+        .map(letter => guessedLetters.includes(letter) ? letter : "_")
+        .join(" ");
+
+      document.getElementById("wrongGuesses").textContent =
+        "Wrong guesses: " + wrongGuesses.join(", ");
+    }
+
+    function generateKeyboard() {
+      const keyboard = document.getElementById("keyboard");
+      keyboard.innerHTML = "";
+      for (let i = 65; i <= 90; i++) {
+        const letter = String.fromCharCode(i).toLowerCase();
+        const button = document.createElement("button");
+        button.textContent = letter;
+        button.disabled = guessedLetters.includes(letter) || wrongGuesses.includes(letter);
+        button.onclick = () => handleGuess(letter);
+        keyboard.appendChild(button);
+      }
+    }
+
+    function handleGuess(letter) {
+      if (chosenWord.includes(letter)) {
+        guessedLetters.push(letter);
+      } else {
+        wrongGuesses.push(letter);
+      }
+      updateDisplay();
+      generateKeyboard();
+      drawHangman();
+      checkGameOver();
+    }
+
+    function drawHangman() {
+      const canvas = document.getElementById("hangmanDrawing");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "#f0f0f0";
+      ctx.lineWidth = 2;
+
+      const parts = [
+        () => { ctx.beginPath(); ctx.moveTo(0, 240); ctx.quadraticCurveTo(100, 200, 200, 240); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(10, 240); ctx.lineTo(190, 240); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(50, 240); ctx.lineTo(50, 20); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(50, 20); ctx.lineTo(150, 20); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(150, 20); ctx.lineTo(150, 50); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.arc(150, 70, 20, 0, Math.PI * 2); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(150, 90); ctx.lineTo(150, 150); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(150, 100); ctx.lineTo(120, 130); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(150, 100); ctx.lineTo(180, 130); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(150, 150); ctx.lineTo(120, 190); ctx.stroke(); },
+        () => { ctx.beginPath(); ctx.moveTo(150, 150); ctx.lineTo(180, 190); ctx.stroke(); },
+      ];
+
+      for (let i = 0; i < wrongGuesses.length && i < parts.length; i++) {
+        parts[i]();
+      }
+    }
+
+    function checkGameOver() {
+  const wordComplete = chosenWord.split("").every(letter => guessedLetters.includes(letter));
+  if (wordComplete) {
+    const audio = document.getElementById("victorySong");
+    audio.play(); // Must come BEFORE rewriting the DOM
+
+    document.body.innerHTML = `
+      <div style="padding: 2em; font-family: monospace; background-color: #121212; color: #f0f0f0;">
+            <h1>Deine</h1>
+			<p>Byl pozdní večer - první máj - </p>
+			<p>večerní máj - byl lásky čas.</p>
+			<p>Hrdliččin zval ku lásce hlas,</p>
+			<p>kde borový zaváněl háj.</p>
+			<p>Dávno v podobné scenérii,</p>
+			<p>bez téhle básně vyjadřující ironii,</p>
+			<p>tam mácha tohle psal,</p>
+			<p>abych si to já nezapamatoval.</p>
+			
+			<br>
+			
+            <p>V noci tu sedím,</p>
+			<p>sedím a přemítám,</p>
+			<p>myšlenky, ty vměstnají se do ticha.</p>
+			
+			<br>
+			
+			<p>Ačkoliv ticho je jen relativní, poznat ho se málokdo zmůže</p>
+			<p>je ticho hlavy,</p>
+			<p>ticho duše,</p>
+			<p>ticho všemožných míst,</p>
+			<p>však já, lásko má, nemám ticho nikde, já nosím si tebe v srdci svém.</p>
+			
+			<br>
+			
+			<p>Každý kámen,</p>
+			<p>všechny božské kreace,</p>
+			<p>tebe dávají zpět a zpět, znova a znova, opět do mé relace</p>
+			<p>ani jsem nemusel říci amen.</p>
+			
+			<br>
+			
+			<p>Všechny věci na tomto světě nějak spojeny s tebou jsou</p>
+			<p>není to náhoda, není to přízeň</p>
+			<p>je to prosté předurčení</p>
+			<p>a ony spojeny s tebou navěky zústanou</p>
+			
+			<br>
+			
+			<p>Allen nicknames I have for you are not enough</p>
+			<p>I want to express myself muy bien my love</p>
+			<p>You are the whole wide universe for me</p>
+			<p>With your lovely, Earth-filled eyes</p>
+			<p>Perfect disguise</p>
+			<p>And loveliest of melodies</p>
+			
+			<br>
+			
+			<p>Ich bin nur and only deine,</p>
+            <p>to vůbec není nějaký závazek kleine,</p>
+			
+			<br>
+			
+			<p>Miluju tě navěky, happiest and loveliest of firsts of Mays</p>
+			<p>Tvůj Bertík 💕</p>
+			
+			
+			<audio autoplay src="lovegame.mp3"></audio>
+          </div>
+    `;
+  } else if (wrongGuesses.length >= maxWrong) {
+    alert("Try again... :<");
+    disableAllButtons();
+  }
+}
+
+    startGame();
+  </script>
+</body>
+</html>

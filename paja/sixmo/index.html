@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wine Pour</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+      flex-direction: column;
+      color: #fff;
+    }
+
+    .scene {
+      display: flex;
+      align-items: flex-end;
+      gap: 60px;
+    }
+
+    .bottle {
+      width: 60px;
+      height: 200px;
+      background: linear-gradient(to bottom, #003300 30%, #660000 30%);
+      border-radius: 10px 10px 5px 5px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 0 5px #000;
+    }
+
+    .bottle::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: 20px;
+      width: 20px;
+      height: 45px;
+      background: #003300;
+      border-radius: 3px;
+    }
+
+    .glass {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bowl {
+      width: 60px;
+      height: 80px;
+      border: 2px solid white;
+      border-radius: 10% 10% 50% 50%;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .fill {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 0%;
+      background-color: #800000;
+      transition: height 0.3s ease;
+    }
+
+    .stem {
+      width: 6px;
+      height: 30px;
+      background: #ccc;
+      margin-top: 2px;
+    }
+
+    .base {
+      width: 40px;
+      height: 10px;
+      background: #ccc;
+      margin-top: 4px;
+      border-radius: 5px;
+    }
+
+    #revealBtn {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: #fff;
+      color: #000;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene">
+    <div class="bottle" id="bottle" title="Touch to pour wine"></div>
+
+    <div class="glass">
+      <div class="bowl">
+        <div class="fill" id="fill"></div>
+      </div>
+      <div class="stem"></div>
+      <div class="base"></div>
+    </div>
+  </div>
+
+  <audio id="audio" src="wine.mp3"></audio>
+
+  <script>
+    let fillLevel = 0;
+    const bottle = document.getElementById("bottle");
+    const fill = document.getElementById("fill");
+    const audio = document.getElementById("audio");
+
+    function pourWine() {
+      if (fillLevel < 100) {
+        fillLevel += 20;
+        fill.style.height = fillLevel + "%";
+      }
+
+      if (fillLevel >= 100) {
+        triggerSuccess();
+      }
+    }
+
+    function triggerSuccess() {
+  const audio = document.getElementById("audio");
+  audio.play().then(() => {
+    setTimeout(() => {
+      document.body.innerHTML = `
+        <div style="padding: 2em; font-family: monospace; background-color: #111; color: #f0f0f0;">
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <h1>Sechs</h1>
+          <p>Miláčku,</p>
+          <p>moravsky já говорить neumím,</p>
+          <p>nepopoznám kdy accent na "i" dát,</p>
+          <p>však ze srdce se báseň milostnou napsat pokusím,</p>
+          <p>pro mou milou, protože ji miluji, mám ji rád</p>
+          <br>
+          <p>Za tu dobu co jsme spolu na Mars bychom doletěli,</p>
+          <p>navěky tam pak (byli kinda nuceni) zůstali.</p>
+          <br>
+          <p>Díky sobě však máme Mars na Zemi,</p>
+          <p>naštěstí nás nikdo nenutí,</p>
+          <p>už se těším až budem spolu zase my,</p>
+          <p>v tom nekonečném finitním objetí. (haha to si odporuje, nějak se to jmenuje ale češtinu už umět nemusiiiimm)</p>
+          <br>
+          <p>řečeno metaforicky,</p>
+          <p>řečeno i vážně</p>
+          <p>myšleno jednosmyslně (to asi není slovo)</p>
+          <p>viděno však djosmyslně,</p>
+          <p>tvoje oči nejkrásnější na světě jsou,</p>
+          <p>chci je vídat dnes a denně, i když poletím raketou</p>
+          <p>na tebe se krásně dívá a já nemůžu uhodnout</p>
+          <p>jak ona přišla na mě, tady,</p>
+          <p>ona logice musela stát zády</p>
+          <p>a v hlavě myšlenku dostat zblázněnou</p>
+          <br>
+          <p>Ve světě velikých jsi moje nejmenší jediná,</p>
+          <p>ta co se nejvíc v kole točí,</p>
+          <p>ta co chasníky odmítá,</p>
+          <p>ona žije o půlnoci když je planeta utichlá</p>
+          <p>vidí něco dobrého (asi) v mém srdci,</p>
+          <p>je jediná co zůstává.</p>
+          <br>
+          <p>Když svůj mobil vidím, srdce začne plesat,</p>
+          <p>jsi tam ty (ale hlavně já a Dragon žeo), tak proč na mysli klesat,</p>
+          <p>pusu ti en distance pokaždé dávám,</p>
+          <p>ačkoliv trochu hloupě si u toho připadám.</p>
+          <p>A tak omlouvám se že asi někdy,</p>
+          <p>po nocích pak škytáš.</p>
+          <br>
+          <p>Já mám svoju děvčicu,</p>
+          <p>umí mluvit moravsky,</p>
+          <p>ni slovo ji nerozumím,</p>
+          <p>tak zkouším všechny jiné jazyky.</p>
+          <br>
+          <p>Nakonec se na tě těším,</p>
+          <p>can't really express how much,</p>
+          <p>tak doufám že, má milá, se na mě nehněváš,</p>
+          <p>a že hubičku mi tímpádem dáš.</p>
+          <p>(See what I did there, hahaaaa)</p>
+          <br>
+          <p>Love you the mostest darling</p>
+          <p>Tvůj Američan (z vysočan)</p>
+          <audio autoplay src="wine.mp3"></audio>
+        </div>
+      `;
+    }, 100); // Let the audio start before DOM is changed
+  }).catch(err => {
+    console.warn("Autoplay failed or was blocked:", err);
+  });
+}
+
+
+
+    bottle.addEventListener("mousedown", pourWine);
+    bottle.addEventListener("touchstart", pourWine);
+  </script>
+
+</body>
+</html>

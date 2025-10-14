@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Counter</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f2f2f2;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    .counter {
+      font-size: 4rem;
+      margin: 1rem 0;
+    }
+
+    button {
+      font-size: 1.2rem;
+      padding: 0.5rem 1.2rem;
+      border: none;
+      background: #0078ff;
+      color: white;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #005fcc;
+    }
+
+    table {
+      margin-top: 2rem;
+      border-collapse: collapse;
+      width: 80%;
+      max-width: 400px;
+      background: white;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #eee;
+      padding: 0.6rem;
+      text-align: center;
+    }
+
+    th {
+      background: #0078ff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Daily Counter</h1>
+  <div class="counter" id="counter">0</div>
+  <button id="incrementBtn">Increment</button>
+
+  <table id="historyTable">
+    <thead>
+      <tr><th>Date</th><th>Count</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const counterEl = document.getElementById("counter");
+    const btn = document.getElementById("incrementBtn");
+    const tableBody = document.querySelector("#historyTable tbody");
+
+    function getTodayKey() {
+      const today = new Date();
+      return today.toISOString().split("T")[0]; // "YYYY-MM-DD"
+    }
+
+    function loadData() {
+      const data = JSON.parse(localStorage.getItem("dailyCounts") || "{}");
+      return data;
+    }
+
+    function saveData(data) {
+      localStorage.setItem("dailyCounts", JSON.stringify(data));
+    }
+
+    function renderTable(data) {
+      tableBody.innerHTML = "";
+      const keys = Object.keys(data).sort().reverse();
+      for (const date of keys) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${date}</td><td>${data[date]}</td>`;
+        tableBody.appendChild(row);
+      }
+    }
+
+    const data = loadData();
+    const todayKey = getTodayKey();
+    if (!data[todayKey]) data[todayKey] = 0;
+
+    counterEl.textContent = data[todayKey];
+    renderTable(data);
+
+    btn.addEventListener("click", () => {
+      data[todayKey]++;
+      saveData(data);
+      counterEl.textContent = data[todayKey];
+      renderTable(data);
+    });
+
+    // Automatically reset daily (if you open after midnight)
+    function checkForNewDay() {
+      const currentKey = getTodayKey();
+      if (!data[currentKey]) {
+        data[currentKey] = 0;
+        saveData(data);
+        counterEl.textContent = 0;
+        renderTable(data);
+      }
+    }
+
+    // Check every minute if day changed
+    setInterval(checkForNewDay, 60 * 1000);
+  </script>
+</body>
+</html>

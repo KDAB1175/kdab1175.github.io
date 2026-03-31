@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Potvůrka - First of May</title>
+  <link rel="icon" href="https://kdab1175.github.io/assets/heart.png" />
+  <style>
+    :root {
+      --bg: #121212;
+      --panel: #1e1e1e;
+      --text: #f0f0f0;
+      --muted: #bbbbbb;
+      --accent: #ff6b81;
+      --accent-2: #6bc5ff;
+      --line: #444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: monospace;
+      background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg) 60%);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: min(92vw, 720px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.3rem, 2.5vw, 2rem);
+    }
+
+    p {
+      margin: 8px 0;
+      color: var(--muted);
+    }
+
+    #status {
+      min-height: 1.6em;
+      margin: 12px 0 18px;
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+    .board {
+      width: min(90vw, 320px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .cell {
+      aspect-ratio: 1 / 1;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #171717;
+      color: var(--text);
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease;
+    }
+
+    .cell:hover:enabled {
+      transform: translateY(-1px);
+      border-color: #6a6a6a;
+    }
+
+    .cell:disabled {
+      cursor: not-allowed;
+      opacity: 0.9;
+    }
+
+    .x {
+      color: #f8f8f8;
+    }
+
+    .o {
+      color: #8bd3ff;
+    }
+
+    .actions {
+      margin-top: 18px;
+    }
+
+    button#restartBtn {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    #animationWrap {
+      display: none;
+      margin-top: 10px;
+    }
+
+    #secretCanvas {
+      width: min(92vw, 560px);
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #141414;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #poemScreen {
+      display: none;
+      text-align: left;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      color: var(--text);
+      margin-top: 14px;
+      font-size: clamp(0.93rem, 2.4vw, 1.02rem);
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <h1>Piškvorky</h1>
+    <p>3x3 board. You are X. Computer is O.</p>
+    <p>The computer will win or tie every time denying passage... almost</p>
+
+    <div id="status">Your turn (X)</div>
+
+    <div class="board" id="board" aria-label="Tic Tac Toe Board"></div>
+
+    <div class="actions">
+      <button id="restartBtn" type="button">Restart Game</button>
+    </div>
+
+    <div id="animationWrap">
+      <canvas id="secretCanvas" width="560" height="280"></canvas>
+    </div>
+
+    <div id="poemScreen"></div>
+  </div>
+
+  <script>
+    const HUMAN = "X";
+    const AI = "O";
+    // Replace this with your song file (for example: "mysong.mp3").
+    const ENDING_SONG_SRC = "paja/sos-official-music-video.mp3";
+    const WIN_LINES = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    const poemText = `The final frontier
+
+I don't even know where to start,
+I need to get you off my mind,
+But I cannot, and by God, it seems I shall not.
+
+Chci napsat jak mi chybíš,
+jak bez tebe je to prázdné.
+Jak doufam že se vidíš,
+a že není ti s někým novým mrazně.
+
+Of course I lived to see another day,
+I do that every day,
+I even once again started thinking as of recently,
+Though that should probably be spoken silently,
+
+I look at girls but it's not the same,
+for every time I look at them my mind goes back to you,
+to the only one I ever loved and God damn it I still do.
+But I would love to forget your name,
+Forget everything that was and that could've been,
+For even though thinking, I am dumb as ever,
+Maybe I'll go visit Sarajevo.
+
+Proč jsi právě ty tak důležitá,
+přece s tebou jsem se domlouval,
+že láska vyšumí do ticha,
+tobě jsem to sliboval,
+Víc jak devět měsíců my nepřežijem,
+I was US-bound and that's what I still am,
+ale najednou, nepřežili jsme ani to,
+a já pak už jen přežívám co je po.
+
+Většinou sem dávám reflexi faktu že je to báseň,
+že ačkoliv ti to říkám, stále je to text,
+nyní ji sem stále dávám, ale je to spíše jako sen,
+ze kterého se probudit nechci, ale nakonec musím jen?
+
+Já chci daleko od toho všeho,
+daleko od toho co tě připomíná,
+třeba na Taiwan bránit freedom,
+nebo na Měsíci se schovávat.
+
+Nakonec vždy ale utíkám před tím jediným,
+před TOU JEDINOU.
+
+I would love to hate you,
+sadly I just love you,
+I hope I forever will,
+and that I never would.
+
+Why do I still think of you daily?
+Why does it have to be that way?
+Why don't I want to be with you maybe?
+Why do I want to run as far from you?
+
+Snad si někdy odpovím,
+doufám že od tebe odpověď nikdy nedostanu,
+snad se ji nikdy nedozvím,
+neb srdce už jen zbývá k žalu.
+
+Myslím že bych se ti vůbec nelíbil,
+I'm now even more against anything and everything,
+but I retained that child-like spirit for some things.
+
+My only hope is that you hate me now,
+for then I would have the martyr status as all lover inevitably do,
+but if I could, I never want to love anyone again including you.
+
+But for all eternity, at least a little bit,
+and at least in silence,
+Miluju tě navždy Potvůrko moje.
+
+P.S. I think you understand me not sending this, for one half of me knows this is dumb and a waste of time, and the other is missing.`;
+
+    const boardEl = document.getElementById("board");
+    const statusEl = document.getElementById("status");
+    const restartBtn = document.getElementById("restartBtn");
+    const animationWrap = document.getElementById("animationWrap");
+    const poemScreen = document.getElementById("poemScreen");
+
+    let board = Array(9).fill("");
+    let gameOver = false;
+
+    function init() {
+      boardEl.innerHTML = "";
+      board = Array(9).fill("");
+      gameOver = false;
+      animationWrap.style.display = "none";
+      poemScreen.style.display = "none";
+      poemScreen.textContent = "";
+      statusEl.textContent = "Your turn (X)";
+
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("button");
+        cell.className = "cell";
+        cell.type = "button";
+        cell.setAttribute("aria-label", `Cell ${i + 1}`);
+        cell.addEventListener("click", () => handleHumanMove(i));
+        boardEl.appendChild(cell);
+      }
+      render();
+    }
+
+    function render() {
+      const cells = boardEl.querySelectorAll(".cell");
+      cells.forEach((cell, i) => {
+        cell.textContent = board[i] || "_";
+        cell.disabled = gameOver || board[i] !== "";
+        cell.classList.remove("x", "o");
+        if (board[i] === HUMAN) cell.classList.add("x");
+        if (board[i] === AI) cell.classList.add("o");
+      });
+    }
+
+    function handleHumanMove(index) {
+      if (gameOver || board[index] !== "") return;
+
+      board[index] = HUMAN;
+      render();
+
+      if (isSecretDiagonalUnlocked(board)) {
+        gameOver = true;
+        disableBoard();
+        runSecretEnding();
+        return;
+      }
+
+      if (hasWinner(board, HUMAN)) {
+        gameOver = true;
+        statusEl.textContent = "X wins.";
+        disableBoard();
+        return;
+      }
+
+      if (isBoardFull(board)) {
+        gameOver = true;
+        statusEl.textContent = "Tie game.";
+        disableBoard();
+        return;
+      }
+
+      statusEl.textContent = "Computer is thinking...";
+      window.setTimeout(() => {
+        const aiChoice = chooseAIMove(board);
+        if (aiChoice !== -1) {
+          board[aiChoice] = AI;
+        }
+
+        render();
+
+        if (hasWinner(board, AI)) {
+          gameOver = true;
+          statusEl.textContent = "Computer wins.";
+          disableBoard();
+          return;
+        }
+
+        if (isBoardFull(board)) {
+          gameOver = true;
+          statusEl.textContent = "Tie game.";
+          disableBoard();
+          return;
+        }
+
+        statusEl.textContent = "Your turn (X)";
+      }, 230);
+    }
+
+    function disableBoard() {
+      boardEl.querySelectorAll(".cell").forEach((c) => {
+        c.disabled = true;
+      });
+    }
+
+    function hasWinner(state, player) {
+      return WIN_LINES.some((line) => line.every((i) => state[i] === player));
+    }
+
+    function isBoardFull(state) {
+      return state.every((v) => v !== "");
+    }
+
+    function isSecretDiagonalUnlocked(state) {
+      return state[0] === HUMAN && state[4] === HUMAN && state[8] === HUMAN;
+    }
+
+    function chooseAIMove(state) {
+      // Special exception: if player is on the 0-4-8 path, do not block that path.
+      const restricted = new Set();
+      const oOnMainDiagonal = [0, 4, 8].some((i) => state[i] === AI);
+
+      if (!oOnMainDiagonal) {
+        if (state[0] === HUMAN && state[4] === "") restricted.add(4);
+        if (state[0] === HUMAN && state[4] === HUMAN && state[8] === "") restricted.add(8);
+      }
+
+      const legalMoves = [];
+      for (let i = 0; i < 9; i++) {
+        if (state[i] === "" && !restricted.has(i)) legalMoves.push(i);
+      }
+
+      const movesToEvaluate = legalMoves.length > 0 ? legalMoves : state
+        .map((v, i) => (v === "" ? i : -1))
+        .filter((i) => i !== -1);
+
+      let bestScore = -Infinity;
+      let bestMove = -1;
+
+      for (const move of movesToEvaluate) {
+        const next = [...state];
+        next[move] = AI;
+        const score = minimax(next, false, 0);
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+      }
+
+      return bestMove;
+    }
+
+    function minimax(state, isMaximizing, depth) {
+      if (hasWinner(state, AI)) return 10 - depth;
+      if (hasWinner(state, HUMAN)) return depth - 10;
+      if (isBoardFull(state)) return 0;
+
+      if (isMaximizing) {
+        let best = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (state[i] !== "") continue;
+          const next = [...state];
+          next[i] = AI;
+          best = Math.max(best, minimax(next, false, depth + 1));
+        }
+        return best;
+      }
+
+      let best = Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (state[i] !== "") continue;
+        const next = [...state];
+        next[i] = HUMAN;
+        best = Math.min(best, minimax(next, true, depth + 1));
+      }
+      return best;
+    }
+
+    function runSecretEnding() {
+      statusEl.textContent = "Diagonal unlocked.";
+      animationWrap.style.display = "block";
+      drawSecretAnimation(() => {
+        showPoemOnlyScreen();
+      });
+    }
+
+    function showPoemOnlyScreen() {
+      document.body.innerHTML = `
+        <div style="max-width: 900px; margin: 0 auto; padding: 24px; color: #f0f0f0; font-family: monospace; white-space: pre-wrap; line-height: 1.5;">
+${poemText}
+        </div>
+        <audio autoplay src="${ENDING_SONG_SRC}"></audio>
+      `;
+    }
+
+    function drawSecretAnimation(onDone) {
+      const canvas = document.getElementById("secretCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const diagA = { x: 86, y: 65 };
+      const diagB = { x: 180, y: 136 };
+      const diagC = { x: 274, y: 206 };
+      const arrowStart = { x: 294, y: 206 };
+      const heart = { x: 470, y: 120 };
+      const bowX = 352;
+      const bowY = 120;
+
+      const totalMs = 3400;
+      const startTime = performance.now();
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function drawX(x, y, size, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = "#f3f3f3";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x - size, y - size);
+        ctx.lineTo(x + size, y + size);
+        ctx.moveTo(x + size, y - size);
+        ctx.lineTo(x - size, y + size);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawArrow(x1, y1, x2, y2, alpha) {
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = "#f3f3f3";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // fletching
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 - 9 * Math.cos(angle - 0.55), y1 - 9 * Math.sin(angle - 0.55));
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 - 9 * Math.cos(angle + 0.55), y1 - 9 * Math.sin(angle + 0.55));
+        ctx.stroke();
+
+        // arrow head
+        ctx.fillStyle = "#f3f3f3";
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - 16 * Math.cos(angle - 0.45), y2 - 16 * Math.sin(angle - 0.45));
+        ctx.lineTo(x2 - 16 * Math.cos(angle + 0.45), y2 - 16 * Math.sin(angle + 0.45));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawBow(pull) {
+        ctx.save();
+        ctx.strokeStyle = "#c8c8c8";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(bowX, bowY - 54);
+        ctx.quadraticCurveTo(bowX + 26, bowY, bowX, bowY + 54);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#9d9d9d";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(bowX + 2, bowY - 50);
+        ctx.lineTo(bowX + 2 - pull, bowY);
+        ctx.lineTo(bowX + 2, bowY + 50);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawHeart(x, y, scale, damage) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+        ctx.beginPath();
+        ctx.moveTo(0, 12);
+        ctx.bezierCurveTo(0, -7, -25, -7, -25, 12);
+        ctx.bezierCurveTo(-25, 30, -4, 42, 0, 50);
+        ctx.bezierCurveTo(4, 42, 25, 30, 25, 12);
+        ctx.bezierCurveTo(25, -7, 0, -7, 0, 12);
+        ctx.closePath();
+        ctx.fillStyle = damage > 0 ? "#ff2e57" : "#ff6b81";
+        ctx.fill();
+        if (damage > 0) {
+          ctx.strokeStyle = "rgba(30, 0, 0, 0.85)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-4, 5);
+          ctx.lineTo(2, 14);
+          ctx.lineTo(-6, 23);
+          ctx.moveTo(6, 10);
+          ctx.lineTo(0, 20);
+          ctx.lineTo(8, 30);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawFrame(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / totalMs);
+
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.strokeStyle = "#2f2f2f";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(40, 30, 280, 210);
+        ctx.beginPath();
+        ctx.moveTo(133, 30);
+        ctx.lineTo(133, 240);
+        ctx.moveTo(226, 30);
+        ctx.lineTo(226, 240);
+        ctx.moveTo(40, 100);
+        ctx.lineTo(320, 100);
+        ctx.moveTo(40, 170);
+        ctx.lineTo(320, 170);
+        ctx.stroke();
+
+        const xPhase = Math.min(1, t / 0.35);
+        const morphPhase = Math.min(1, Math.max(0, (t - 0.35) / 0.25));
+        const flightPhase = Math.min(1, Math.max(0, (t - 0.6) / 0.22));
+        const impactPhase = Math.min(1, Math.max(0, (t - 0.82) / 0.18));
+
+        drawHeart(heart.x, heart.y, 1.2, impactPhase);
+
+        // Show the three diagonal X symbols first.
+        if (xPhase > 0) {
+          drawX(diagA.x, diagA.y, 16, Math.min(1, xPhase * 1.7));
+          drawX(diagB.x, diagB.y, 16, Math.max(0, Math.min(1, (xPhase - 0.18) * 2)));
+          drawX(diagC.x, diagC.y, 16, Math.max(0, Math.min(1, (xPhase - 0.36) * 2.4)));
+        }
+
+        // Morph the diagonal X line into an arrow body.
+        const morphStartX = lerp(diagA.x, diagB.x, morphPhase);
+        const morphStartY = lerp(diagA.y, diagB.y, morphPhase);
+        const morphEndX = lerp(diagC.x, arrowStart.x, morphPhase);
+        const morphEndY = lerp(diagC.y, arrowStart.y, morphPhase);
+        if (morphPhase > 0) {
+          drawArrow(morphStartX, morphStartY, morphEndX, morphEndY, 0.95);
+        }
+
+        // Draw bow and then shoot.
+        if (t > 0.52) {
+          const pull = t < 0.6 ? (0.6 - t) * 150 : 0;
+          drawBow(Math.max(0, pull));
+        }
+
+        // Arrow flight from bow to heart.
+        if (flightPhase > 0) {
+          const fx1 = lerp(arrowStart.x, bowX + 5, 1 - flightPhase);
+          const fy1 = lerp(arrowStart.y, bowY, 1 - flightPhase);
+          const fx2 = lerp(arrowStart.x + 30, heart.x - 20, flightPhase);
+          const fy2 = lerp(arrowStart.y - 8, heart.y + 5, flightPhase);
+          drawArrow(fx1, fy1, fx2, fy2, 1);
+        }
+
+        if (impactPhase > 0) {
+          const burst = impactPhase;
+          ctx.strokeStyle = "rgba(255, 120, 140, 0.75)";
+          ctx.lineWidth = 2;
+          for (let i = 0; i < 12; i++) {
+            const a = (Math.PI * 2 * i) / 12;
+            const r1 = 20;
+            const r2 = 20 + burst * 40;
+            ctx.beginPath();
+            ctx.moveTo(heart.x + Math.cos(a) * r1, heart.y + Math.sin(a) * r1);
+            ctx.lineTo(heart.x + Math.cos(a) * r2, heart.y + Math.sin(a) * r2);
+            ctx.stroke();
+          }
+        }
+
+        if (t < 1) {
+          requestAnimationFrame(drawFrame);
+        } else {
+          onDone();
+        }
+      }
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    restartBtn.addEventListener("click", init);
+    init();
+  </script>
+</body>
+</html>

@@ -174,7 +174,7 @@
       [2, 4, 6]
     ];
 
-    const poemText = `The final frontier
+    const poemText = `<b>The final frontier</b>
 
 I don't even know where to start,
 I need to get you off my mind,
@@ -426,17 +426,40 @@ P.S. I think you understand me not sending this, for one half of me knows this i
       statusEl.textContent = "Diagonal unlocked.";
       animationWrap.style.display = "block";
       drawSecretAnimation(() => {
-        showPoemOnlyScreen();
+        showRevealButtonScreen();
       });
     }
 
-    function showPoemOnlyScreen() {
+    function showRevealButtonScreen() {
+      document.body.innerHTML = `
+        <div style="min-height: 100vh; display: grid; place-items: center; background: #121212; color: #f0f0f0; font-family: monospace; padding: 24px;">
+          <div style="text-align: center;">
+            <p style="margin-bottom: 14px;">The arrow has struck its intended target.</p>
+            <button id="revealBtn" type="button" style="padding: 12px 20px; border: 1px solid #444; border-radius: 8px; background: #2a2a2a; color: #f0f0f0; font-family: monospace; cursor: pointer;">Continue</button>
+          </div>
+        </div>
+      `;
+      const revealBtn = document.getElementById("revealBtn");
+      revealBtn.addEventListener("click", () => {
+        showPoemOnlyScreen(true);
+      });
+    }
+
+    function showPoemOnlyScreen(playMusic) {
       document.body.innerHTML = `
         <div style="max-width: 900px; margin: 0 auto; padding: 24px; color: #f0f0f0; font-family: monospace; white-space: pre-wrap; line-height: 1.5;">
 ${poemText}
         </div>
-        <audio autoplay src="${ENDING_SONG_SRC}"></audio>
       `;
+      if (playMusic) {
+        const audio = document.createElement("audio");
+        audio.src = ENDING_SONG_SRC;
+        audio.loop = true;
+        audio.autoplay = true;
+        audio.style.display = "none";
+        document.body.appendChild(audio);
+        audio.play().catch(() => {});
+      }
     }
 
     function drawSecretAnimation(onDone) {

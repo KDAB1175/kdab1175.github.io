@@ -462,11 +462,11 @@ P.S. I think you understand me not sending this, for one half of me knows this i
 
     function showPoemOnlyScreen() {
       appEl.innerHTML = `
+        <div style="text-align:center; padding-top: 12px;">
+          <button id="musicRetryBtn" type="button" style="display:none; padding: 8px 12px; border: 1px solid #444; border-radius: 8px; background: #2a2a2a; color: #f0f0f0; font-family: monospace; cursor: pointer;">Play music</button>
+        </div>
         <div style="max-width: 900px; margin: 0 auto; padding: 24px; color: #f0f0f0; font-family: monospace; white-space: pre-wrap; line-height: 1.5;">
 ${poemText}
-        </div>
-        <div style="text-align:center; padding-bottom: 20px;">
-          <button id="musicRetryBtn" type="button" style="display:none; padding: 8px 12px; border: 1px solid #444; border-radius: 8px; background: #2a2a2a; color: #f0f0f0; font-family: monospace; cursor: pointer;">Play music</button>
         </div>
       `;
       const retryBtn = document.getElementById("musicRetryBtn");

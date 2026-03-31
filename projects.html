@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects | AlbertOS</title>
+  <link rel="icon" href="../assets/planetary-defender.png">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Manrope", "Segoe UI", sans-serif;
+      color: #12243e;
+      background: linear-gradient(165deg, #d7e8fa, #f3f9ff);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+    main {
+      width: min(940px, 100%);
+      background: #fff;
+      border: 1px solid #d1dfef;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    h1 { margin-top: 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border: 1px dashed #9fb8d4;
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 112px;
+    }
+    a { color: #0a4f9a; font-weight: 700; }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Projects Placeholder</h1>
+    <p>Use these slots for your project case studies.</p>
+    <section class="grid">
+      <article class="card"><strong>Project 1</strong><p>Add summary, stack, and results.</p></article>
+      <article class="card"><strong>Project 2</strong><p>Add summary, stack, and results.</p></article>
+      <article class="card"><strong>Project 3</strong><p>Add summary, stack, and results.</p></article>
+      <article class="card"><strong>Project 4</strong><p>Add summary, stack, and results.</p></article>
+    </section>
+    <p><a href="index.html">Back to AlbertOS desktop</a></p>
+  </main>
+</body>
+</html>

@@ -157,6 +157,7 @@
 
     <div id="poemScreen"></div>
   </div>
+  <audio id="endingMusic" loop preload="auto" style="display:none;"></audio>
 
   <script>
     const HUMAN = "X";
@@ -254,6 +255,8 @@ P.S. I think you understand me not sending this, for one half of me knows this i
     const restartBtn = document.getElementById("restartBtn");
     const animationWrap = document.getElementById("animationWrap");
     const poemScreen = document.getElementById("poemScreen");
+    const appEl = document.getElementById("app");
+    const endingMusicEl = document.getElementById("endingMusic");
 
     let board = Array(9).fill("");
     let gameOver = false;
@@ -431,35 +434,43 @@ P.S. I think you understand me not sending this, for one half of me knows this i
     }
 
     function showRevealButtonScreen() {
-      document.body.innerHTML = `
-        <div style="min-height: 100vh; display: grid; place-items: center; background: #121212; color: #f0f0f0; font-family: monospace; padding: 24px;">
-          <div style="text-align: center;">
-            <p style="margin-bottom: 14px;">The arrow has struck its intended target.</p>
-            <button id="revealBtn" type="button" style="padding: 12px 20px; border: 1px solid #444; border-radius: 8px; background: #2a2a2a; color: #f0f0f0; font-family: monospace; cursor: pointer;">Continue</button>
-          </div>
+      appEl.innerHTML = `
+        <div style="text-align: center; padding: 36px 20px;">
+          <p style="margin-bottom: 14px; color: #f0f0f0;">The arrow has struck its intended target.</p>
+          <button id="revealBtn" type="button" style="padding: 12px 20px; border: 1px solid #444; border-radius: 8px; background: #2a2a2a; color: #f0f0f0; font-family: monospace; cursor: pointer;">Continue</button>
         </div>
       `;
       const revealBtn = document.getElementById("revealBtn");
       revealBtn.addEventListener("click", () => {
-        showPoemOnlyScreen(true);
+        showPoemOnlyScreen();
+        playEndingMusic();
       });
     }
 
-    function showPoemOnlyScreen(playMusic) {
-      document.body.innerHTML = `
+    function playEndingMusic() {
+      endingMusicEl.src = ENDING_SONG_SRC;
+      endingMusicEl.loop = true;
+      endingMusicEl.load();
+      endingMusicEl.play().then(() => {
+        const retryBtn = document.getElementById("musicRetryBtn");
+        if (retryBtn) retryBtn.style.display = "none";
+      }).catch(() => {
+        const retryBtn = document.getElementById("musicRetryBtn");
+        if (retryBtn) retryBtn.style.display = "inline-block";
+      });
+    }
+
+    function showPoemOnlyScreen() {
+      appEl.innerHTML = `
         <div style="max-width: 900px; margin: 0 auto; padding: 24px; color: #f0f0f0; font-family: monospace; white-space: pre-wrap; line-height: 1.5;">
 ${poemText}
         </div>
+        <div style="text-align:center; padding-bottom: 20px;">
+          <button id="musicRetryBtn" type="button" style="display:none; padding: 8px 12px; border: 1px solid #444; border-radius: 8px; background: #2a2a2a; color: #f0f0f0; font-family: monospace; cursor: pointer;">Play music</button>
+        </div>
       `;
-      if (playMusic) {
-        const audio = document.createElement("audio");
-        audio.src = ENDING_SONG_SRC;
-        audio.loop = true;
-        audio.autoplay = true;
-        audio.style.display = "none";
-        document.body.appendChild(audio);
-        audio.play().catch(() => {});
-      }
+      const retryBtn = document.getElementById("musicRetryBtn");
+      retryBtn.addEventListener("click", () => playEndingMusic());
     }
 
     function drawSecretAnimation(onDone) {

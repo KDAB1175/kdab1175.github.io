@@ -1,63 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Albert Hajek - Home</title>
-    <link rel="icon" href="assets/planetary-defender.png">
-    <style>
-      body, html {
-          margin: 0;
-          padding: 0;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-family: Arial, sans-serif;
-          background-color: #f0f0f0;
-      }
-      .container {
-          text-align: center;
-          background: #fff;
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      .container h1 {
-          margin-bottom: 20px;
-      }
-      .social-links a {
-          display: inline-block;
-          margin: 10px;
-          text-decoration: none;
-          color: #fff;
-          background-color: #0073b1;
-          padding: 10px 20px;
-          border-radius: 0;
-          transition: background-color 0.3s;
-      }
-      .social-links a.github { background-color: #333; }
-      .social-links a.twitter { background-color: #27282B; }
-      .social-links a:hover {
-          opacity: 0.8;
-      }
-      .blog-link a {
-          color: #666;
-          text-decoration: underline;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlbertOS</title>
+  <link rel="icon" href="../assets/planetary-defender.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1><img src="assets/planetary-defender.png" alt="My profile picture" width="30"> Albert Hajek</h1>
-        <p>Welcome to my personal website, I like to code, solder, tinker and more. I am currently learning Machine Learning :)</p>
-        <p>Feel free to check out my sociales (e intended):</p>
-        <div class="social-links">
-            <a href="https://x.com/albert_hajek" class="X" target="_blank">X / Twitter</a>
-            <a href="https://www.linkedin.com/in/albert-hajek-85a873188/" class="linkedin" target="_blank">LinkedIn</a>
-            <a href="https://github.com/KDAB1175" class="github" target="_blank">GitHub</a>
-        </div>
-      <p class="blog-link">You can also check out my blog <a href="blog/">here</a></p>
+  <div class="boot-screen" id="boot-screen" aria-hidden="true">
+    <div class="boot-core">
+      <div class="boot-logo">A</div>
+      <p>AlbertOS</p>
+      <div class="boot-bar"><span id="boot-progress"></span></div>
     </div>
+  </div>
+  <div class="wallpaper-glow"></div>
+
+  <header class="menu-bar">
+    <div class="menu-left">
+      <span class="apple-dot" aria-hidden="true"></span>
+      <strong>AlbertOS</strong>
+      <span class="menu-sep">|</span>
+      <a href="../index.html">Classic Site</a>
+    </div>
+    <div class="menu-right">
+      <button id="wallpaper-toggle" class="menu-btn" type="button">Wallpaper</button>
+      <button id="joke-toggle" class="menu-btn" type="button">Meme Note</button>
+      <span id="clock">--:--</span>
+    </div>
+  </header>
+
+  <main class="desktop" aria-label="Desktop">
+    <button class="desktop-icon" data-app="about" type="button">
+      <span class="icon-glyph app-about">A</span>
+      <span>About</span>
+    </button>
+    <button class="desktop-icon" data-app="terminal" type="button">
+      <span class="icon-glyph terminal-glyph app-terminal">&gt;_</span>
+      <span>Terminal</span>
+    </button>
+    <button class="desktop-icon" data-app="resume" type="button">
+      <span class="icon-glyph app-resume">CV</span>
+      <span>Resume</span>
+    </button>
+    <button class="desktop-icon" data-app="projects" type="button">
+      <span class="icon-glyph app-projects">PR</span>
+      <span>Projects</span>
+    </button>
+    <button class="desktop-icon" data-app="experience" type="button">
+      <span class="icon-glyph app-experience">XP</span>
+      <span>Experience</span>
+    </button>
+    <button class="desktop-icon" data-app="gallery" type="button">
+      <span class="icon-glyph app-gallery">PH</span>
+      <span>Gallery</span>
+    </button>
+
+    <aside class="desktop-note" id="desktop-note">
+      <strong>Sticky Note</strong>
+      <p id="desktop-note-text">Computer is like air conditioning. It becomes useless when you open Windows.</p>
+    </aside>
+  </main>
+
+  <section class="window active" id="window-about" data-app-window="about" style="--x:8vw; --y:14vh; --w:min(560px, 90vw); --h:min(56vh, 460px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="about" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>About</strong>
+      <span class="meta">profile.md</span>
+    </div>
+    <div class="window-content about-content">
+      <h1>Albert Hajek</h1>
+      <p>A personal website in desktop form: clean storytelling, interactive terminal, and room to grow.</p>
+      <p>This version is built to feel closer to a small operating system while staying static and GitHub Pages ready.</p>
+      <div class="quick-grid">
+        <a href="resume.html">Open Resume Placeholder</a>
+        <a href="projects.html">Open Projects Placeholder</a>
+        <a href="experience.html">Open Experience Placeholder</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="window active" id="window-terminal" data-app-window="terminal" style="--x:20vw; --y:22vh; --w:min(760px, 94vw); --h:min(68vh, 600px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="terminal" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>Terminal</strong>
+      <span class="meta">bash</span>
+    </div>
+    <div class="window-content terminal-content">
+      <div class="terminal-scroll" id="terminal-scroll" aria-live="polite">
+        <div id="terminal-output" class="terminal-output"></div>
+        <label class="terminal-input-wrap terminal-input-inline" id="terminal-input-line">
+          <span id="terminal-prompt">albert@macos ~ %</span>
+          <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" placeholder="help">
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section class="window" id="window-resume" data-app-window="resume" style="--x:14vw; --y:18vh; --w:min(780px, 96vw); --h:min(58vh, 500px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="resume" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>Resume</strong>
+      <span class="meta">resume.html</span>
+    </div>
+    <div class="window-content">
+      <h2>Resume Placeholder</h2>
+      <p>Use this space for your short summary, top skills, and current role.</p>
+      <ul>
+        <li>Profile summary</li>
+        <li>Skills and technologies</li>
+        <li>Education and certifications</li>
+      </ul>
+      <a class="inline-link" href="resume.html">Open full resume page</a>
+    </div>
+  </section>
+
+  <section class="window" id="window-projects" data-app-window="projects" style="--x:18vw; --y:20vh; --w:min(840px, 96vw); --h:min(58vh, 500px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="projects" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>Projects</strong>
+      <span class="meta">projects.html</span>
+    </div>
+    <div class="window-content">
+      <h2>Projects Placeholder</h2>
+      <p>Add your main projects here with links, outcomes, and stack details.</p>
+      <div class="cards">
+        <article>
+          <h3>Project Slot 01</h3>
+          <p>Problem, approach, and result summary goes here.</p>
+        </article>
+        <article>
+          <h3>Project Slot 02</h3>
+          <p>Include one visual, one metric, and one key challenge.</p>
+        </article>
+      </div>
+      <a class="inline-link" href="projects.html">Open full projects page</a>
+    </div>
+  </section>
+
+  <section class="window" id="window-experience" data-app-window="experience" style="--x:16vw; --y:17vh; --w:min(840px, 96vw); --h:min(58vh, 500px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="experience" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>Experience</strong>
+      <span class="meta">experience.html</span>
+    </div>
+    <div class="window-content">
+      <h2>Work Experience Placeholder</h2>
+      <p>Write your timeline with role, company, dates, and measurable impact.</p>
+      <ol>
+        <li>Role title + company + date range</li>
+        <li>Main responsibilities and ownership</li>
+        <li>Results with metrics or clear outcomes</li>
+      </ol>
+      <a class="inline-link" href="experience.html">Open full experience page</a>
+    </div>
+  </section>
+
+  <section class="window" id="window-gallery" data-app-window="gallery" style="--x:24vw; --y:14vh; --w:min(940px, 96vw); --h:min(70vh, 700px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="gallery" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>Gallery</strong>
+      <span class="meta">photos.app</span>
+    </div>
+    <div class="window-content gallery-content">
+      <div class="photos-topbar">
+        <div class="photos-dots" aria-hidden="true">
+          <span class="."></span>
+          <span class="."></span>
+          <span class="."></span>
+        </div>
+        <p class="photos-title" id="gallery-title">Cambodia Wiring Shot</p>
+        <span class="photos-sub">1 item</span>
+      </div>
+      <div class="photos-stage">
+        <img id="gallery-image" src="../assets/my_profile_pic.jpg" alt="Cambodia wiring photo">
+      </div>
+      <div class="photos-toolbar">
+        <button type="button" id="gallery-share">Share</button>
+        <button type="button" id="gallery-favorite">Favorite</button>
+        <button type="button" id="gallery-info">Info</button>
+      </div>
+      <p id="gallery-info-text" class="gallery-info" hidden>Cambodia field wiring photo. Mission log visual proof.</p>
+    </div>
+  </section>
+
+  <nav class="dock" id="dock">
+    <button type="button" class="dock-item app-about" data-app="about" aria-label="About">
+      <span>A</span>
+    </button>
+    <button type="button" class="dock-item app-terminal" data-app="terminal" aria-label="Terminal">
+      <span>&gt;_</span>
+    </button>
+    <button type="button" class="dock-item app-resume" data-app="resume" aria-label="Resume">
+      <span>CV</span>
+    </button>
+    <button type="button" class="dock-item app-projects" data-app="projects" aria-label="Projects">
+      <span>PR</span>
+    </button>
+    <button type="button" class="dock-item app-experience" data-app="experience" aria-label="Experience">
+      <span>XP</span>
+    </button>
+    <button type="button" class="dock-item app-gallery" data-app="gallery" aria-label="Gallery">
+      <span>PH</span>
+    </button>
+  </nav>
+
+  <script src="script.js"></script>
 </body>
 </html>

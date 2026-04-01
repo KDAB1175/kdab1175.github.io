@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -17,7 +17,7 @@
       padding: 28px;
     }
     main {
-      width: min(940px, 100%);
+      width: min(980px, 100%);
       background: #fff;
       border: 1px solid #d1dfef;
       border-radius: 16px;
@@ -30,11 +30,17 @@
       gap: 12px;
     }
     .card {
-      border: 1px dashed #9fb8d4;
+      border: 1px solid #d6e4f3;
       border-radius: 12px;
       padding: 14px;
-      min-height: 112px;
+      background: #fbfdff;
     }
+    .meta {
+      color: #466587;
+      font-size: 0.93rem;
+      margin-bottom: 6px;
+    }
+    ul { margin: 8px 0 0 18px; }
     a { color: #0a4f9a; font-weight: 700; }
     @media (max-width: 760px) {
       .grid { grid-template-columns: 1fr; }
@@ -43,15 +49,52 @@
 </head>
 <body>
   <main>
-    <h1>Projects Placeholder</h1>
-    <p>Use these slots for your project case studies.</p>
+    <h1>Project Highlights</h1>
+    <p>Selected engineering projects from software, embedded systems, and robotics.</p>
+
     <section class="grid">
-      <article class="card"><strong>Project 1</strong><p>Add summary, stack, and results.</p></article>
-      <article class="card"><strong>Project 2</strong><p>Add summary, stack, and results.</p></article>
-      <article class="card"><strong>Project 3</strong><p>Add summary, stack, and results.</p></article>
-      <article class="card"><strong>Project 4</strong><p>Add summary, stack, and results.</p></article>
+      <article class="card">
+        <strong>ESA Astro Pi (ISS Mission Space Lab)</strong>
+        <div class="meta">Python, data analysis, scientific writing</div>
+        <ul>
+          <li>Developed and deployed experiments to run on the International Space Station.</li>
+          <li>Calculated ISS speed with 0.01% relative accuracy and analyzed magnetosphere behavior.</li>
+          <li>Produced full mission report accepted by ESA Astro Pi.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <strong>Autonomous Airplane Navigation</strong>
+        <div class="meta">C, ESP32, IMU integration, PCB design</div>
+        <ul>
+          <li>Built a lightweight navigation stack for flight in GPS-denied conditions.</li>
+          <li>Designed custom PCB with sensors and ESP32-based processing pipeline.</li>
+          <li>Implemented calibration logic for robust orientation estimation.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <strong>Environmental Sensing Platform</strong>
+        <div class="meta">ESP32, Linux backend, Flutter app</div>
+        <ul>
+          <li>Created embedded sensing unit and custom board for field data collection.</li>
+          <li>Built Linux-based backend API and persistence layer for telemetry.</li>
+          <li>Shipped a Flutter mobile app for real-time visualization and control.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <strong>Merkur Robotics Competition</strong>
+        <div class="meta">Team leadership, robotics, systems integration</div>
+        <ul>
+          <li>Led team architecture and implementation for a robotic arm challenge.</li>
+          <li>Coordinated hardware/software integration and task strategy.</li>
+          <li>Won 1st place in national competition category.</li>
+        </ul>
+      </article>
     </section>
-    <p><a href="index.html">Back to AlbertOS desktop</a></p>
+
+    <p><a href="experience.html">See Work Experience</a> | <a href="resume.html">Open Resume</a> | <a href="index.html">Back to AlbertOS desktop</a></p>
   </main>
 </body>
 </html>

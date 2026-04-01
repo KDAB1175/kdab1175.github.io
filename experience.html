@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -17,7 +17,7 @@
       padding: 28px;
     }
     main {
-      width: min(880px, 100%);
+      width: min(920px, 100%);
       background: #fff;
       border: 1px solid #d1dfef;
       border-radius: 16px;
@@ -32,23 +32,58 @@
       gap: 14px;
     }
     .role {
-      border: 1px dashed #9fb8d4;
+      border: 1px solid #d6e4f3;
       border-radius: 10px;
       padding: 12px;
+      background: #fbfdff;
     }
+    .meta {
+      color: #466587;
+      font-size: 0.93rem;
+      margin: 4px 0 6px;
+    }
+    ul { margin: 6px 0 0 18px; }
     a { color: #0a4f9a; font-weight: 700; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Experience Placeholder</h1>
-    <p>This page is ready for your work history and impact metrics.</p>
+    <h1>Work Experience</h1>
+    <p>Professional and freelance work across backend development, automation, and operations support.</p>
+
     <section class="timeline">
-      <article class="role"><strong>Role Placeholder 01</strong><p>Company, dates, ownership, outcomes.</p></article>
-      <article class="role"><strong>Role Placeholder 02</strong><p>Company, dates, ownership, outcomes.</p></article>
-      <article class="role"><strong>Role Placeholder 03</strong><p>Company, dates, ownership, outcomes.</p></article>
+      <article class="role">
+        <strong>Junior Java Developer - Procul Soft s.r.o.</strong>
+        <div class="meta">Brno, Czech Republic | Feb 2026 - Present</div>
+        <ul>
+          <li>Developing backend components for government-sector software systems.</li>
+          <li>Contributing to Java service features used in public administration workflows.</li>
+          <li>Working in a collaborative engineering team with production constraints and reviews.</li>
+        </ul>
+      </article>
+
+      <article class="role">
+        <strong>Independent Contractor - Small Business Web App</strong>
+        <div class="meta">Remote | Spring 2025</div>
+        <ul>
+          <li>Built a custom MySQL + PHP management system for business operations.</li>
+          <li>Implemented data structures and CRUD flows tailored to owner workflows.</li>
+          <li>Delivered maintainable code and documentation for future extension.</li>
+        </ul>
+      </article>
+
+      <article class="role">
+        <strong>Summer Helper - agriKomp Bohemia s.r.o.</strong>
+        <div class="meta">Czech Republic | Summers 2022, 2023, 2025</div>
+        <ul>
+          <li>Supported logistics, administration, warehouse setup, and technical maintenance.</li>
+          <li>Created a Bash-based time-tracking automation to reduce manual processing.</li>
+          <li>Coordinated mixed technical and operational tasks in time-sensitive periods.</li>
+        </ul>
+      </article>
     </section>
-    <p><a href="index.html">Back to AlbertOS desktop</a></p>
+
+    <p><a href="projects.html">See Project Highlights</a> | <a href="resume.html">Open Resume</a> | <a href="index.html">Back to AlbertOS desktop</a></p>
   </main>
 </body>
 </html>

@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --ink: #102138;
   --muted: #385273;
   --glass: rgba(246, 251, 255, 0.7);
@@ -23,11 +23,33 @@ body {
 body {
   font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(65vw 65vh at 88% 20%, rgba(255, 206, 149, 0.38), transparent 60%),
-    radial-gradient(55vw 55vh at 4% 95%, rgba(99, 151, 255, 0.45), transparent 50%),
-    linear-gradient(165deg, #92b7df 0%, #5b88ba 35%, #2f5f8f 70%, #1f4469 100%);
+  background: #16365b;
   overflow: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--wallpaper-image, url("../assets/wallpapers/sonoma.svg"));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.01);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(90vw 80vh at 90% 12%, rgba(255, 229, 180, 0.22), transparent 62%),
+    radial-gradient(80vw 76vh at 6% 96%, rgba(120, 165, 255, 0.2), transparent 58%),
+    linear-gradient(180deg, rgba(9, 18, 36, 0.08), rgba(6, 12, 24, 0.26));
 }
 
 body.booting {
@@ -87,24 +109,19 @@ body.booting {
 }
 
 body.wallpaper-sonoma {
-  background:
-    radial-gradient(65vw 65vh at 88% 20%, rgba(255, 206, 149, 0.38), transparent 60%),
-    radial-gradient(55vw 55vh at 4% 95%, rgba(99, 151, 255, 0.45), transparent 50%),
-    linear-gradient(165deg, #92b7df 0%, #5b88ba 35%, #2f5f8f 70%, #1f4469 100%);
+  --wallpaper-image: url("../assets/wallpapers/sonoma.svg");
 }
 
 body.wallpaper-big-sur {
-  background:
-    radial-gradient(55vw 65vh at 14% 24%, rgba(255, 125, 91, 0.55), transparent 55%),
-    radial-gradient(56vw 50vh at 82% 80%, rgba(37, 131, 255, 0.52), transparent 55%),
-    linear-gradient(150deg, #fe9a6e 0%, #f26a68 35%, #396ad8 70%, #1d3179 100%);
+  --wallpaper-image: url("../assets/wallpapers/big-sur.svg");
+}
+
+body.wallpaper-tahoe {
+  --wallpaper-image: url("../assets/wallpapers/tahoe.svg");
 }
 
 body.wallpaper-joke {
-  background:
-    radial-gradient(45vw 55vh at 90% 20%, rgba(144, 255, 196, 0.28), transparent 60%),
-    radial-gradient(45vw 55vh at 8% 78%, rgba(131, 179, 255, 0.32), transparent 62%),
-    linear-gradient(145deg, #203243 0%, #1d4a56 30%, #356d53 60%, #6b9543 100%);
+  --wallpaper-image: url("../assets/wrapper.png");
 }
 
 .wallpaper-glow {
@@ -769,3 +786,4 @@ body.wallpaper-joke {
     grid-template-rows: 44px 1fr 50px auto;
   }
 }
+

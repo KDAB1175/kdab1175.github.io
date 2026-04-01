@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   var windows = Array.prototype.slice.call(document.querySelectorAll("[data-app-window]"));
   var launchers = Array.prototype.slice.call(document.querySelectorAll("[data-app]"));
   var closeButtons = Array.prototype.slice.call(document.querySelectorAll("[data-close]"));
@@ -31,12 +31,43 @@
   var log = [];
   var editor = null; // {type:'nano'|'vim', ...}
 
-  var wallpapers = ["wallpaper-sonoma", "wallpaper-big-sur", "wallpaper-joke"];
+  var wallpapers = [
+    { className: "wallpaper-sonoma", label: "Sonoma" },
+    { className: "wallpaper-big-sur", label: "Big Sur" },
+    { className: "wallpaper-tahoe", label: "Tahoe" },
+    { className: "wallpaper-joke", label: "Meme" }
+  ];
   var wallpaperIndex = 0;
   var jokes = [
     "Computer is like air conditioning. It becomes useless when you open Windows.",
     "There is no place like 127.0.0.1.",
-    "On my machine, it was a feature."
+    "On my machine, it was a feature.",
+	"When launching, please ensure the pointy end is up and the flamy end is down.",
+	"Bogo sort, the potential is endless!",
+	"Godspeed Artemis II!",
+	"Are any of you actually reading these?",
+	"If you are using Linux, it is important to ALWAYS remove the french language pack via: sudo rm -fr ./*",
+	"It works on my machine. Please don’t touch it.",
+	"Let's hope we won't see a rapid unscheduled disassembly around here.",
+	"Orbital mechanics: falling, but missing the ground.",
+	"Space is hard. Especially the ‘going there’ and ‘coming back’ parts.",
+	"If it moves and it shouldn’t: duct tape. If it doesn’t move and it should: WD-40.",
+	"Nothing is more permanent than a temporary fix.",
+	"That’s not a bug, that’s an anomaly.",
+	"Kerbal Space Program pro-tip: Adding more boosters usually helps.",
+	"sudo make me a sandwich",
+	"Keyboard not found. Press any key to continue.",
+	"I paid for the whole mountain, I’m using the whole mountain.",
+	"Speed has never killed anyone. Suddenly becoming stationary, that’s what gets you.",
+	"BMW owners: It’s not leaking oil, it’s marking its territory.",
+	"Skiing is just controlled falling with style.",
+	"If you no longer go for a gap that exists, ...",
+	"This isn't even a browser, yet it provides a better experience than IE, doesn't it?",
+	"If you don’t fall, you’re not trying hard enough.",
+	"I can quit anytime. I just need one more part.",
+	"Horsepower is how fast you hit the wall. Torque is how far you take the wall with you.",
+	"I write comments because future me is an idiot, if I don't current me is.",
+	"There are two hard problems in computer science: cache invalidation, naming things, and off-by-one errors."
   ];
   var jokeIndex = 0;
   var appNames = ["about", "terminal", "resume", "projects", "experience", "gallery"];
@@ -46,7 +77,7 @@
   function dir() { return { type: "dir", entries: {} }; }
   function file(content) { return { type: "file", content: content || "" }; }
   var fsRoot = dir();
-  var home = ["Users", "albert"];
+  var home = ["Users", "you"];
   var cwd = home.slice();
 
   function pstr(seg) { return "/" + seg.join("/"); }
@@ -108,7 +139,7 @@
     fsRoot.entries.Users.entries.albert.entries.Documents = dir();
     fsRoot.entries.Users.entries.albert.entries.Projects = dir();
     fsRoot.entries.Users.entries.albert.entries.Notes = dir();
-    write(["Users", "albert", "README.txt"], "AlbertOS ephemeral filesystem.\nNothing persists after refresh.");
+    write(["Users", "albert", "README.txt"], "notamacOS ephemeral filesystem.\nNothing persists after refresh.");
     write(["Users", "albert", "Documents", "resume.txt"], "Put your resume highlights here.");
     write(["Users", "albert", "Projects", "ideas.md"], "Project concepts and build notes.");
     write(["Users", "albert", "Notes", "todo.txt"], "1) polish site\n2) ship");
@@ -138,12 +169,12 @@
     terminalScroll.scrollTop = terminalScroll.scrollHeight;
   }
   function setPrompt() {
-    terminalPrompt.textContent = "albert@macos " + showPath(cwd) + " %";
+    terminalPrompt.textContent = "you@notamacOS " + showPath(cwd) + " %";
     terminalInput.placeholder = "help";
   }
   function resetTerm() {
     log = [];
-    addLine("Welcome to AlbertOS.");
+    addLine("Welcome to notamacOS.");
     addLine("Type <help> to list commands.");
     addLine("Use Ctrl+L to clear, Tab to autocomplete.");
     drawLog();
@@ -194,15 +225,15 @@
   }
 
   function cycleWallpaper() {
-    document.body.classList.remove(wallpapers[wallpaperIndex]);
+    document.body.classList.remove(wallpapers[wallpaperIndex].className);
     wallpaperIndex = (wallpaperIndex + 1) % wallpapers.length;
-    document.body.classList.add(wallpapers[wallpaperIndex]);
-    say("Wallpaper set: " + wallpapers[wallpaperIndex].replace("wallpaper-", "") + ".");
+    document.body.classList.add(wallpapers[wallpaperIndex].className);
+    say("Wallpaper set: " + wallpapers[wallpaperIndex].label + ".");
   }
   function cycleJoke() {
     jokeIndex = (jokeIndex + 1) % jokes.length;
     noteText.textContent = jokes[jokeIndex];
-    say("Meme note updated.");
+    say("Sticky note updated.");
   }
   function external(url) { window.open(url, "_blank", "noopener"); }
   function openGalleryCambodia() {
@@ -581,7 +612,7 @@
 
   initFs();
   document.body.classList.add("booting");
-  document.body.classList.add(wallpapers[wallpaperIndex]);
+  document.body.classList.add(wallpapers[wallpaperIndex].className);
   noteText.textContent = jokes[jokeIndex];
   if (window.matchMedia("(max-width: 920px)").matches) {
     windows.forEach(function (w) { w.classList.remove("active", "focused", "minimized"); });
@@ -605,3 +636,5 @@
     document.body.classList.remove("booting");
   }
 })();
+
+

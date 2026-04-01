@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlbertOS</title>
+  <title>notamacOS</title>
   <link rel="icon" href="../assets/planetary-defender.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
   <div class="boot-screen" id="boot-screen" aria-hidden="true">
     <div class="boot-core">
       <div class="boot-logo">A</div>
-      <p>AlbertOS</p>
+      <p>notamacOS</p>
       <div class="boot-bar"><span id="boot-progress"></span></div>
     </div>
   </div>
@@ -23,13 +23,13 @@
   <header class="menu-bar">
     <div class="menu-left">
       <span class="apple-dot" aria-hidden="true"></span>
-      <strong>AlbertOS</strong>
+      <strong>notamacOS</strong>
       <span class="menu-sep">|</span>
       <a href="../index.html">Classic Site</a>
     </div>
     <div class="menu-right">
       <button id="wallpaper-toggle" class="menu-btn" type="button">Wallpaper</button>
-      <button id="joke-toggle" class="menu-btn" type="button">Meme Note</button>
+      <button id="joke-toggle" class="menu-btn" type="button">Sticky Note</button>
       <span id="clock">--:--</span>
     </div>
   </header>
@@ -56,7 +56,7 @@
       <span>Experience</span>
     </button>
     <button class="desktop-icon" data-app="gallery" type="button">
-      <span class="icon-glyph app-gallery">PH</span>
+      <span class="icon-glyph app-gallery">G</span>
       <span>Gallery</span>
     </button>
 
@@ -78,12 +78,12 @@
     </div>
     <div class="window-content about-content">
       <h1>Albert Hajek</h1>
-      <p>A personal website in desktop form: clean storytelling, interactive terminal, and room to grow.</p>
-      <p>This version is built to feel closer to a small operating system while staying static and GitHub Pages ready.</p>
+      <p>Welcome to my personal website. I wanted to make something special-ish and thus I want you to experience this OS-like environment while also learning something about my skills, ambitions and passions.</p>
+      <p></p>
       <div class="quick-grid">
-        <a href="resume.html">Open Resume Placeholder</a>
-        <a href="projects.html">Open Projects Placeholder</a>
-        <a href="experience.html">Open Experience Placeholder</a>
+        <a href="resume.html">Open Resume</a>
+        <a href="projects.html">Open Projects</a>
+        <a href="experience.html">Open Experience</a>
       </div>
     </div>
   </section>
@@ -102,7 +102,7 @@
       <div class="terminal-scroll" id="terminal-scroll" aria-live="polite">
         <div id="terminal-output" class="terminal-output"></div>
         <label class="terminal-input-wrap terminal-input-inline" id="terminal-input-line">
-          <span id="terminal-prompt">albert@macos ~ %</span>
+          <span id="terminal-prompt">you@notamacOS ~ %</span>
           <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" placeholder="help">
         </label>
       </div>
@@ -120,12 +120,13 @@
       <span class="meta">resume.html</span>
     </div>
     <div class="window-content">
-      <h2>Resume Placeholder</h2>
-      <p>Use this space for your short summary, top skills, and current role.</p>
+      <h2>Resume Snapshot</h2>
+      <p>Computer Science student focused on backend systems, embedded development, and robotics.</p>
       <ul>
-        <li>Profile summary</li>
-        <li>Skills and technologies</li>
-        <li>Education and certifications</li>
+        <li>Junior Java Developer at Procul Soft (Czech government backend systems)</li>
+        <li>ESA Astro Pi mission participant with ISS experiment deployment</li>
+        <li>TOEFL iBT 111 and multilingual communication (Czech, Slovak, English, French)</li>
+        <li>Core stack: Python, C, Java, Linux, SQL, Docker, ESP32</li>
       </ul>
       <a class="inline-link" href="resume.html">Open full resume page</a>
     </div>
@@ -142,16 +143,24 @@
       <span class="meta">projects.html</span>
     </div>
     <div class="window-content">
-      <h2>Projects Placeholder</h2>
-      <p>Add your main projects here with links, outcomes, and stack details.</p>
+      <h2>Project Highlights</h2>
+      <p>Selected projects across software, embedded systems, and robotics.</p>
       <div class="cards">
         <article>
-          <h3>Project Slot 01</h3>
-          <p>Problem, approach, and result summary goes here.</p>
+          <h3>ESA Astro Pi (ISS Mission Space Lab)</h3>
+          <p>Built and deployed ISS experiments, including speed estimation with 0.01% relative accuracy and magnetosphere analysis.</p>
         </article>
         <article>
-          <h3>Project Slot 02</h3>
-          <p>Include one visual, one metric, and one key challenge.</p>
+          <h3>Autonomous Airplane Navigation</h3>
+          <p>Developed ESP32 + IMU navigation logic for GPS-denied conditions with custom PCB-based hardware.</p>
+        </article>
+        <article>
+          <h3>Environmental Sensing Platform</h3>
+          <p>Created an ESP32 sensing unit, Linux backend, and Flutter app for real-time environmental telemetry.</p>
+        </article>
+        <article>
+          <h3>Merkur Robotics Competition</h3>
+          <p>Led team systems integration for a robotic arm challenge and won 1st place.</p>
         </article>
       </div>
       <a class="inline-link" href="projects.html">Open full projects page</a>
@@ -169,13 +178,22 @@
       <span class="meta">experience.html</span>
     </div>
     <div class="window-content">
-      <h2>Work Experience Placeholder</h2>
-      <p>Write your timeline with role, company, dates, and measurable impact.</p>
-      <ol>
-        <li>Role title + company + date range</li>
-        <li>Main responsibilities and ownership</li>
-        <li>Results with metrics or clear outcomes</li>
-      </ol>
+      <h2>Work Experience</h2>
+      <p>Professional and freelance work across backend engineering and operations.</p>
+      <div class="cards">
+        <article>
+          <h3>Junior Java Developer - Procul Soft s.r.o. (Feb 2026 - Present)</h3>
+          <p>Building Java backend components for Czech government software workflows in a production team environment.</p>
+        </article>
+        <article>
+          <h3>Independent Contractor - Small Business Web App (Spring 2025)</h3>
+          <p>Delivered a custom MySQL + PHP application with tailored CRUD flows and maintainable handoff documentation.</p>
+        </article>
+        <article>
+          <h3>Summer Helper - agriKomp Bohemia s.r.o. (2022, 2023, 2025)</h3>
+          <p>Handled logistics/admin/technical tasks and built a Bash automation for internal time tracking.</p>
+        </article>
+      </div>
       <a class="inline-link" href="experience.html">Open full experience page</a>
     </div>
   </section>
@@ -229,10 +247,12 @@
       <span>XP</span>
     </button>
     <button type="button" class="dock-item app-gallery" data-app="gallery" aria-label="Gallery">
-      <span>PH</span>
+      <span>G</span>
     </button>
   </nav>
 
   <script src="script.js"></script>
 </body>
 </html>
+
+

@@ -850,16 +850,25 @@ body.showing-desktop .window.desktop-hidden {
     #0a1120;
 }
 
-.photos-stage img {
+.photos-stage::before {
+  content: "";
   position: absolute;
   inset: 22px;
-  width: calc(100% - 44px);
-  height: calc(100% - 44px);
-  max-width: none;
-  max-height: none;
-  object-fit: contain;
+  background: url("../assets/my_profile_pic.jpg") center / contain no-repeat;
   border-radius: 10px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.45));
+}
+
+.photos-stage img {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .photos-toolbar {
@@ -1113,10 +1122,8 @@ body.showing-desktop .window.desktop-hidden {
     padding: 0;
   }
 
-  .photos-stage img {
+  .photos-stage::before {
     inset: 12px;
-    width: calc(100% - 24px);
-    height: calc(100% - 24px);
   }
 
   .gallery-content {

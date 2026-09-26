@@ -1,6 +1,7 @@
 ﻿(function () {
   var windows = Array.prototype.slice.call(document.querySelectorAll("[data-app-window]"));
   var launchers = Array.prototype.slice.call(document.querySelectorAll("[data-app]"));
+  var desktopIcons = Array.prototype.slice.call(document.querySelectorAll(".desktop-icon"));
   var closeButtons = Array.prototype.slice.call(document.querySelectorAll("[data-close]"));
   var minButtons = Array.prototype.slice.call(document.querySelectorAll(".dot.min"));
   var maxButtons = Array.prototype.slice.call(document.querySelectorAll(".dot.max"));
@@ -12,6 +13,16 @@
   var terminalScroll = document.getElementById("terminal-scroll");
   var terminalInputLine = document.getElementById("terminal-input-line");
   var terminalWindow = document.getElementById("window-terminal");
+  var browserForm = document.getElementById("browser-form");
+  var browserAddress = document.getElementById("browser-address");
+  var browserFrame = document.getElementById("browser-frame");
+  var browserBack = document.getElementById("browser-back");
+  var browserForward = document.getElementById("browser-forward");
+  var browserReload = document.getElementById("browser-reload");
+  var browserHome = document.getElementById("browser-home");
+  var browserExternal = document.getElementById("browser-external");
+  var browserNotice = document.getElementById("browser-notice");
+  var desktop = document.querySelector(".desktop");
   var dock = document.getElementById("dock");
   var galleryShare = document.getElementById("gallery-share");
   var galleryFavorite = document.getElementById("gallery-favorite");
@@ -26,6 +37,14 @@
   var bootProgress = document.getElementById("boot-progress");
 
   var zCounter = 70;
+  var runningApps = {};
+  var dockContextMenu = null;
+  var appSummaries = {};
+  var fullAppContent = {};
+  var browserHistory = [];
+  var browserHistoryIndex = -1;
+  var browserBlockedMode = false;
+  var browserHomepage = "https://merkurcorporation.com/magellan/";
   var history = [];
   var historyIndex = -1;
   var log = [];
@@ -70,7 +89,7 @@
 	"There are two hard problems in computer science: cache invalidation, naming things, and off-by-one errors."
   ];
   var jokeIndex = 0;
-  var appNames = ["about", "terminal", "resume", "projects", "experience", "gallery"];
+  var appNames = ["about", "terminal", "browser", "resume", "projects", "experience", "gallery"];
   var goTargets = ["github", "linkedin", "x", "blog", "cambodia", "110"];
   var commandNames = ["help", "clear", "pwd", "ls", "cd", "mkdir", "touch", "cat", "grep", "rm", "mv", "cp", "vim", "open", "wallpaper", "meme", "go"];
 
@@ -185,21 +204,44 @@
     clock.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
   function getWindow(app) { return document.getElementById("window-" + app); }
+  ["resume", "projects", "experience"].forEach(function (app) {
+    var content = getWindow(app).querySelector(".window-content");
+    appSummaries[app] = content.innerHTML;
+  });
+  function getAppName(app) {
+    var item = dock.querySelector('[data-app="' + app + '"]');
+    return item ? item.getAttribute("aria-label") || app : app;
+  }
   function syncDock() {
     dockItems.forEach(function (d) {
-      var w = getWindow(d.getAttribute("data-app"));
-      d.classList.remove("open", "minimized");
+      var app = d.getAttribute("data-app"), w = getWindow(app);
+      d.classList.remove("running", "open", "minimized");
+      if (runningApps[app]) d.classList.add("running");
       if (w && w.classList.contains("active")) d.classList.add(w.classList.contains("minimized") ? "minimized" : "open");
+      d.setAttribute("data-running", runningApps[app] ? "true" : "false");
     });
   }
+  function blurWindows() {
+    windows.forEach(function (w) { w.classList.remove("focused"); });
+    if (document.activeElement && document.activeElement.closest && document.activeElement.closest(".window")) document.activeElement.blur();
+  }
   function focus(w) {
-    if (!w) return;
+    if (!w || !w.classList.contains("active") || w.classList.contains("minimized")) return;
     zCounter += 1; w.style.zIndex = String(zCounter);
-    windows.forEach(function (i) { i.classList.remove("focused"); });
+    blurWindows();
     w.classList.add("focused");
+  }
+  function focusNext(except) {
+    var candidates = windows.filter(function (w) {
+      return w !== except && w.classList.contains("active") && !w.classList.contains("minimized");
+    }).sort(function (a, b) {
+      return (parseInt(b.style.zIndex, 10) || 0) - (parseInt(a.style.zIndex, 10) || 0);
+    });
+    if (candidates.length) focus(candidates[0]); else blurWindows();
   }
   function openApp(app) {
     var w = getWindow(app); if (!w) return;
+    runningApps[app] = true;
     w.classList.add("active"); w.classList.remove("minimized");
     focus(w); syncDock();
     var dockItem = dock.querySelector('[data-app="' + app + '"]');
@@ -211,17 +253,157 @@
       });
     }
     if (app === "terminal") terminalInput.focus();
+    if (app === "browser") {
+      if (browserHistoryIndex < 0) loadBrowserUrl(browserHomepage, true);
+      browserAddress.focus();
+    }
   }
-  function closeApp(app) {
+  function closeWindow(app) {
     var w = getWindow(app); if (!w) return;
     w.classList.remove("active", "focused", "minimized", "fullscreen");
-    syncDock();
+    syncDock(); focusNext(w);
   }
-  function minimize(w) { if (w && w.classList.contains("active")) { w.classList.add("minimized"); w.classList.remove("focused"); syncDock(); } }
+  function quitApp(app) {
+    var w = getWindow(app); if (!w) return;
+    delete runningApps[app];
+    w.classList.remove("active", "focused", "minimized", "fullscreen");
+    syncDock(); focusNext(w); closeDockContextMenu();
+  }
+  function minimize(w) {
+    if (!w || !w.classList.contains("active")) return;
+    w.classList.add("minimized"); w.classList.remove("focused");
+    syncDock(); focusNext(w);
+  }
   function fullscreen(w) {
-    if (!w || window.matchMedia("(max-width: 920px)").matches) return;
+    if (!w) return;
     w.classList.toggle("fullscreen"); if (w.classList.contains("minimized")) w.classList.remove("minimized");
     focus(w); syncDock();
+  }
+  function closeDockContextMenu() {
+    if (!dockContextMenu) return;
+    dockContextMenu.remove(); dockContextMenu = null;
+  }
+  function openDockContextMenu(item) {
+    closeDockContextMenu();
+    var app = item.getAttribute("data-app"), running = !!runningApps[app];
+    var menu = document.createElement("div");
+    menu.className = "dock-context-menu"; menu.setAttribute("role", "menu");
+    var title = document.createElement("div");
+    title.className = "dock-context-title"; title.textContent = getAppName(app);
+    menu.appendChild(title);
+    var show = document.createElement("button");
+    show.type = "button"; show.setAttribute("role", "menuitem");
+    show.textContent = running ? "Show" : "Open";
+    show.addEventListener("click", function () { openApp(app); closeDockContextMenu(); });
+    menu.appendChild(show);
+    if (running) {
+      var divider = document.createElement("div"); divider.className = "dock-context-divider"; menu.appendChild(divider);
+      var quit = document.createElement("button");
+      quit.type = "button"; quit.setAttribute("role", "menuitem"); quit.textContent = "Quit";
+      quit.addEventListener("click", function () { quitApp(app); });
+      menu.appendChild(quit);
+    }
+    document.body.appendChild(menu); dockContextMenu = menu;
+    var anchor = item.getBoundingClientRect(), box = menu.getBoundingClientRect();
+    var left = anchor.left + anchor.width / 2 - box.width / 2;
+    left = Math.max(8, Math.min(window.innerWidth - box.width - 8, left));
+    menu.style.left = left + "px";
+    menu.style.top = Math.max(42, anchor.top - box.height - 12) + "px";
+    var first = menu.querySelector("button"); if (first) first.focus();
+  }
+  function renderFullApp(app, markup) {
+    var w = getWindow(app), content = w && w.querySelector(".window-content");
+    if (!content) return;
+    content.innerHTML = markup;
+    content.classList.add("detail-view");
+    content.removeAttribute("aria-busy");
+    var back = document.createElement("button");
+    back.type = "button"; back.className = "detail-back";
+    back.setAttribute("data-summary", app); back.textContent = "Back to summary";
+    content.insertBefore(back, content.firstChild); content.scrollTop = 0;
+  }
+  function restoreAppSummary(app) {
+    var w = getWindow(app), content = w && w.querySelector(".window-content");
+    if (!content || !appSummaries[app]) return;
+    content.innerHTML = appSummaries[app];
+    content.classList.remove("detail-view"); content.removeAttribute("aria-busy");
+    content.scrollTop = 0; openApp(app);
+  }
+  function loadFullApp(app) {
+    var w = getWindow(app), content = w && w.querySelector(".window-content");
+    if (!content) return;
+    openApp(app); content.setAttribute("aria-busy", "true");
+    if (fullAppContent[app]) return renderFullApp(app, fullAppContent[app]);
+    fetch(app + ".html").then(function (response) {
+      if (!response.ok) throw new Error("Unable to load " + app);
+      return response.text();
+    }).then(function (html) {
+      var parsed = new DOMParser().parseFromString(html, "text/html");
+      var main = parsed.querySelector("main");
+      if (!main) throw new Error("Missing page content");
+      fullAppContent[app] = main.innerHTML;
+      renderFullApp(app, fullAppContent[app]);
+    }).catch(function () {
+      content.removeAttribute("aria-busy");
+      var status = document.createElement("p");
+      status.className = "detail-error";
+      status.textContent = "Content unavailable. Please try again.";
+      content.insertBefore(status, content.firstChild);
+    });
+  }
+  function browserTarget(value) {
+    var input = (value || "").trim();
+    if (!input) return "https://www.google.com/webhp?igu=1";
+    if (/^https?:\/\//i.test(input)) {
+      try {
+        var parsed = new URL(input);
+        if (/^(www\.)?google\.[a-z.]+$/i.test(parsed.hostname)) {
+          if (parsed.pathname === "/search") {
+            parsed.searchParams.set("igu", "1");
+            return parsed.toString();
+          }
+          return "https://www.google.com/webhp?igu=1";
+        }
+      } catch (e) { return input; }
+      return input.replace(/^(https?:\/\/)spacex\.com(?=\/|$)/i, "$1www.spacex.com");
+    }
+    if (/^(localhost|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/.*)?$/i.test(input)) return "http://" + input;
+    if (/^(www\.)?google\.[a-z.]+(\/|$)/i.test(input)) return "https://www.google.com/webhp?igu=1";
+    if (/^spacex\.com(\/|$)/i.test(input)) input = "www." + input;
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\:\d+)?(\/.*)?$/i.test(input)) return "https://" + input;
+    return "https://www.google.com/search?igu=1&q=" + encodeURIComponent(input);
+  }
+  function syncBrowserControls() {
+    browserBack.disabled = browserHistoryIndex <= 0;
+    browserForward.disabled = browserHistoryIndex < 0 || browserHistoryIndex >= browserHistory.length - 1;
+  }
+  function browserBlocksEmbedding(url) {
+    try {
+      var host = new URL(url).hostname.toLowerCase();
+      return host === "spacex.com" || host === "www.spacex.com";
+    } catch (e) {
+      return false;
+    }
+  }
+  function showBrowserBlockedPage() {
+    browserFrame.removeAttribute("src");
+    browserFrame.srcdoc = "<!doctype html><html><body style='margin:0;display:grid;place-items:center;min-height:100vh;font-family:system-ui;background:#f5f8fc;color:#173452'><main style='max-width:560px;text-align:center;padding:24px'><h1 style='margin:0 0 10px;font-size:1.55rem'>Website embedding blocked</h1><p style='margin:0 0 8px;line-height:1.55'>This website only allows trusted sites to display it.</p><p style='margin:0;line-height:1.55'>Use <strong>Open externally</strong> for the full website.</p></main></body></html>";
+  }
+  function loadBrowserUrl(url, remember) {
+    if (remember !== false) {
+      browserHistory = browserHistory.slice(0, browserHistoryIndex + 1);
+      browserHistory.push(url); browserHistoryIndex = browserHistory.length - 1;
+    }
+    browserAddress.value = url;
+    browserBlockedMode = browserBlocksEmbedding(url);
+    if (browserBlockedMode) {
+      browserNotice.textContent = "This website prevents in-window embedding.";
+      showBrowserBlockedPage();
+      syncBrowserControls(); return;
+    }
+    browserNotice.textContent = "Loading " + url + ".";
+    browserFrame.removeAttribute("srcdoc"); browserFrame.src = url;
+    syncBrowserControls();
   }
 
   function cycleWallpaper() {
@@ -418,7 +600,7 @@
     terminalScroll.scrollTop = terminalScroll.scrollHeight;
     if (!cmd) return;
 
-    if (cmd === "help") return say("Commands:\nhelp, clear, pwd, ls [path], cd [path], mkdir <dir>, touch <file>, cat <file>\ngrep [-i] [-n] <pattern> <file>\nrm [-r] <path>, mv <src> <dst>, cp [-r] <src> <dst>\nvim <file>\nopen resume|projects|experience|gallery|about|terminal\nwallpaper next, meme next\ngo github|linkedin|x|blog|cambodia|110");
+    if (cmd === "help") return say("Commands:\nhelp, clear, pwd, ls [path], cd [path], mkdir <dir>, touch <file>, cat <file>\ngrep [-i] [-n] <pattern> <file>\nrm [-r] <path>, mv <src> <dst>, cp [-r] <src> <dst>\nvim <file>\nopen resume|projects|experience|gallery|about|terminal|browser\nwallpaper next, meme next\ngo github|linkedin|x|blog|cambodia|110");
     if (cmd === "clear") return resetTerm();
     if (cmd === "pwd") return say(pstr(cwd));
     if (cmd === "ls") {
@@ -540,16 +722,36 @@
 
   function makeDraggable(win) {
     var bar = win.querySelector(".window-bar");
-    if (!bar || window.matchMedia("(max-width: 920px)").matches) return;
-    var drag = false, sx = 0, sy = 0, ox = 0, oy = 0;
-    bar.addEventListener("mousedown", function (e) {
-      if (e.target.classList.contains("dot") || win.classList.contains("fullscreen")) return;
-      drag = true; focus(win); sx = e.clientX; sy = e.clientY; ox = win.offsetLeft; oy = win.offsetTop; bar.style.cursor = "grabbing"; e.preventDefault();
+    if (!bar) return;
+    var pointerId = null, moved = false, snapReady = false;
+    var sx = 0, sy = 0, ox = 0, oy = 0;
+    var startedFullscreen = false, grabRatioX = 0.5, grabOffsetY = 18;
+    bar.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0 || e.target.closest(".dot")) return;
+      pointerId = e.pointerId; moved = false; snapReady = false;
+      focus(win); sx = e.clientX; sy = e.clientY;
+      var startRect = win.getBoundingClientRect();
+      startedFullscreen = win.classList.contains("fullscreen");
+      grabRatioX = Math.max(0.08, Math.min(0.92, (e.clientX - startRect.left) / startRect.width));
+      grabOffsetY = e.clientY - startRect.top;
+      ox = win.offsetLeft; oy = win.offsetTop;
+      bar.setPointerCapture(pointerId); e.preventDefault();
     });
-    window.addEventListener("mousemove", function (e) {
-      if (!drag) return;
+    bar.addEventListener("pointermove", function (e) {
+      if (pointerId !== e.pointerId) return;
+      if (e.pointerType === "mouse" && e.buttons === 0) return finishDragging(e, false);
+      if (!moved && Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) < 5) return;
+      moved = true; bar.style.cursor = "grabbing";
+      if (startedFullscreen) {
+        win.classList.remove("fullscreen");
+        var restored = win.getBoundingClientRect();
+        ox = Math.max(0, Math.min(window.innerWidth - restored.width, e.clientX - restored.width * grabRatioX));
+        oy = Math.max(34, e.clientY - grabOffsetY);
+        sx = e.clientX; sy = e.clientY; startedFullscreen = false;
+        syncDock(); focus(win);
+      }
       var nx = ox + (e.clientX - sx);
-      var ny = oy + (e.clientY - sy);
+      var rawY = oy + (e.clientY - sy), ny = rawY;
       var maxX = Math.max(0, window.innerWidth - win.offsetWidth);
       var maxY = Math.max(34, window.innerHeight - 42);
       if (nx < 0) nx = 0;
@@ -558,8 +760,72 @@
       if (ny > maxY) ny = maxY;
       win.style.left = nx + "px";
       win.style.top = ny + "px";
+      snapReady = rawY <= 38 || e.clientY <= 58;
+      win.classList.toggle("snap-ready", snapReady);
+      e.preventDefault();
     });
-    window.addEventListener("mouseup", function () { drag = false; bar.style.cursor = "grab"; });
+    function finishDragging(e, allowSnap) {
+      if (pointerId !== e.pointerId) return;
+      var finishedPointer = pointerId, shouldSnap = allowSnap && moved && snapReady;
+      pointerId = null; moved = false; snapReady = false;
+      startedFullscreen = false;
+      bar.style.cursor = "grab"; win.classList.remove("snap-ready");
+      if (bar.hasPointerCapture(finishedPointer)) bar.releasePointerCapture(finishedPointer);
+      if (shouldSnap) fullscreen(win);
+    }
+    bar.addEventListener("pointerup", function (e) { finishDragging(e, true); });
+    bar.addEventListener("pointercancel", function (e) { finishDragging(e, false); });
+    bar.addEventListener("lostpointercapture", function (e) {
+      if (pointerId !== e.pointerId) return;
+      pointerId = null; moved = false; snapReady = false; startedFullscreen = false;
+      bar.style.cursor = "grab"; win.classList.remove("snap-ready");
+    });
+  }
+  function makeResizable(win) {
+    ["n", "ne", "e", "se", "s", "sw", "w", "nw"].forEach(function (direction) {
+      var handle = document.createElement("div");
+      handle.className = "resize-handle resize-" + direction;
+      handle.setAttribute("aria-hidden", "true");
+      win.appendChild(handle);
+      var pointerId = null, startX = 0, startY = 0, startRect = null;
+      handle.addEventListener("pointerdown", function (e) {
+        if (e.button !== 0 || win.classList.contains("fullscreen")) return;
+        pointerId = e.pointerId; startX = e.clientX; startY = e.clientY;
+        startRect = win.getBoundingClientRect(); handle.setPointerCapture(pointerId);
+        focus(win); e.preventDefault(); e.stopPropagation();
+      });
+      handle.addEventListener("pointermove", function (e) {
+        if (pointerId !== e.pointerId || !startRect) return;
+        var dx = e.clientX - startX, dy = e.clientY - startY;
+        var left = startRect.left, top = startRect.top;
+        var width = startRect.width, height = startRect.height;
+        var minWidth = Math.min(340, window.innerWidth - 16);
+        var minHeight = Math.min(220, window.innerHeight - 76);
+        if (direction.indexOf("e") >= 0) width += dx;
+        if (direction.indexOf("s") >= 0) height += dy;
+        if (direction.indexOf("w") >= 0) { width -= dx; left += dx; }
+        if (direction.indexOf("n") >= 0) { height -= dy; top += dy; }
+        if (width < minWidth) { if (direction.indexOf("w") >= 0) left -= minWidth - width; width = minWidth; }
+        if (height < minHeight) { if (direction.indexOf("n") >= 0) top -= minHeight - height; height = minHeight; }
+        left = Math.max(0, Math.min(window.innerWidth - width, left));
+        top = Math.max(34, Math.min(window.innerHeight - 42, top));
+        width = Math.min(width, window.innerWidth - left);
+        height = Math.min(height, window.innerHeight - top);
+        win.style.left = left + "px"; win.style.top = top + "px";
+        win.style.width = width + "px"; win.style.height = height + "px";
+      });
+      function stopResizing(e) {
+        if (pointerId !== e.pointerId) return;
+        var finishedPointer = pointerId; pointerId = null; startRect = null;
+        if (handle.hasPointerCapture(finishedPointer)) handle.releasePointerCapture(finishedPointer);
+      }
+      handle.addEventListener("pointerup", stopResizing);
+      handle.addEventListener("pointercancel", stopResizing);
+      handle.addEventListener("lostpointercapture", function (e) {
+        if (pointerId !== e.pointerId) return;
+        pointerId = null; startRect = null;
+      });
+    });
   }
   function makeNoteDraggable(note) {
     if (!note || window.matchMedia("(max-width: 920px)").matches) return;
@@ -569,18 +835,94 @@
     window.addEventListener("mousemove", function (e) { if (!drag) return; note.style.left = ox + (e.clientX - sx) + "px"; note.style.top = oy + (e.clientY - sy) + "px"; });
     window.addEventListener("mouseup", function () { drag = false; note.style.cursor = "grab"; });
   }
+  function makeDesktopIconDraggable(icon) {
+    var pointerId = null, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    icon.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0) return;
+      pointerId = e.pointerId; moved = false; sx = e.clientX; sy = e.clientY;
+      ox = icon.offsetLeft; oy = icon.offsetTop;
+      icon.setPointerCapture(pointerId);
+    });
+    icon.addEventListener("pointermove", function (e) {
+      if (pointerId !== e.pointerId) return;
+      if (e.pointerType === "mouse" && e.buttons === 0) return stopDragging(e);
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if (!moved && Math.abs(dx) + Math.abs(dy) < 5) return;
+      moved = true; icon.classList.add("dragging");
+      var maxX = Math.max(0, desktop.clientWidth - icon.offsetWidth);
+      var maxY = Math.max(0, desktop.clientHeight - icon.offsetHeight - 82);
+      icon.style.left = Math.max(0, Math.min(maxX, ox + dx)) + "px";
+      icon.style.top = Math.max(0, Math.min(maxY, oy + dy)) + "px";
+    });
+    function stopDragging(e) {
+      if (pointerId !== e.pointerId) return;
+      var finishedPointer = pointerId; pointerId = null; icon.classList.remove("dragging");
+      if (icon.hasPointerCapture(finishedPointer)) icon.releasePointerCapture(finishedPointer);
+      if (moved) {
+        icon._suppressLaunch = true;
+        window.requestAnimationFrame(function () { icon._suppressLaunch = false; });
+      }
+      moved = false;
+    }
+    icon.addEventListener("pointerup", stopDragging);
+    icon.addEventListener("pointercancel", stopDragging);
+    icon.addEventListener("lostpointercapture", function (e) {
+      if (pointerId !== e.pointerId) return;
+      pointerId = null; moved = false; icon.classList.remove("dragging");
+    });
+  }
 
   document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && dockContextMenu) { closeDockContextMenu(); return; }
     if (!editor || editor.type !== "vim") return;
     if (handleVimKey(e)) e.preventDefault();
   });
 
-  launchers.forEach(function (b) { b.addEventListener("click", function () { openApp(b.getAttribute("data-app")); }); });
-  closeButtons.forEach(function (b) { b.addEventListener("click", function () { closeApp(b.getAttribute("data-close")); }); });
+  launchers.forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (b._suppressLaunch) return;
+      openApp(b.getAttribute("data-app"));
+    });
+  });
+  document.addEventListener("click", function (e) {
+    var summary = e.target.closest("[data-summary]");
+    if (summary) { restoreAppSummary(summary.getAttribute("data-summary")); return; }
+    var link = e.target.closest('a[href="resume.html"], a[href="projects.html"], a[href="experience.html"], a[href="index.html"]');
+    if (!link || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var href = link.getAttribute("href");
+    if (href === "index.html") {
+      var owner = link.closest("[data-app-window]");
+      if (owner) closeWindow(owner.getAttribute("data-app-window"));
+      return;
+    }
+    var app = href.replace(".html", "");
+    if (link.classList.contains("inline-link") || link.closest(".detail-view")) loadFullApp(app);
+    else openApp(app);
+  });
+  closeButtons.forEach(function (b) { b.addEventListener("click", function () { closeWindow(b.getAttribute("data-close")); }); });
   minButtons.forEach(function (b) { b.addEventListener("click", function () { minimize(b.closest(".window")); }); });
   maxButtons.forEach(function (b) { b.addEventListener("click", function () { fullscreen(b.closest(".window")); }); });
   bars.forEach(function (b) { b.addEventListener("dblclick", function () { fullscreen(b.closest(".window")); }); });
-  windows.forEach(function (w) { makeDraggable(w); w.addEventListener("mousedown", function () { focus(w); }); });
+  windows.forEach(function (w) {
+    makeDraggable(w); makeResizable(w);
+    w.addEventListener("mousedown", function () {
+      if (!w.classList.contains("focused")) focus(w);
+    });
+  });
+  desktopIcons.forEach(makeDesktopIconDraggable);
+  dockItems.forEach(function (item) {
+    item.addEventListener("contextmenu", function (e) { e.preventDefault(); openDockContextMenu(item); });
+    item.addEventListener("keydown", function (e) {
+      if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) { e.preventDefault(); openDockContextMenu(item); }
+    });
+  });
+  document.addEventListener("mousedown", function (e) {
+    var target = e.target;
+    if (dockContextMenu && !target.closest(".dock-context-menu") && !target.closest(".dock-item")) closeDockContextMenu();
+    if (target.closest(".window, .dock, .menu-bar, .desktop-icon, .desktop-note, .dock-context-menu")) return;
+    blurWindows();
+  });
   if (galleryShare) {
     galleryShare.addEventListener("click", function () {
       window.open("https://x.com/intent/tweet?text=" + encodeURIComponent("some guy made this crazy portfolio website abc.xyz"), "_blank", "noopener");
@@ -597,9 +939,50 @@
       galleryInfoText.hidden = !galleryInfoText.hidden;
     });
   }
+  browserForm.addEventListener("submit", function (e) {
+    e.preventDefault(); loadBrowserUrl(browserTarget(browserAddress.value), true);
+  });
+  browserBack.addEventListener("click", function () {
+    if (browserHistoryIndex <= 0) return;
+    browserHistoryIndex -= 1; loadBrowserUrl(browserHistory[browserHistoryIndex], false);
+  });
+  browserForward.addEventListener("click", function () {
+    if (browserHistoryIndex >= browserHistory.length - 1) return;
+    browserHistoryIndex += 1; loadBrowserUrl(browserHistory[browserHistoryIndex], false);
+  });
+  browserReload.addEventListener("click", function () {
+    if (browserHistoryIndex >= 0) loadBrowserUrl(browserHistory[browserHistoryIndex], false);
+  });
+  browserHome.addEventListener("click", function () {
+    loadBrowserUrl(browserTarget(""), true);
+  });
+  browserExternal.addEventListener("click", function () {
+    var url = browserHistoryIndex >= 0 ? browserHistory[browserHistoryIndex] : browserTarget(browserAddress.value);
+    window.open(url, "_blank", "noopener");
+  });
+  browserFrame.addEventListener("load", function () {
+    if (browserHistoryIndex < 0 || browserBlockedMode) return;
+    browserNotice.textContent = "Loaded " + browserHistory[browserHistoryIndex] + ". Some websites may refuse embedding.";
+  });
   wallpaperToggle.addEventListener("click", cycleWallpaper);
   jokeToggle.addEventListener("click", cycleJoke);
-  terminalScroll.addEventListener("mousedown", function () { if (!editor || editor.type !== "vim") terminalInput.focus(); });
+  var terminalPointerStart = null;
+  terminalWindow.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0 || e.target.closest("button, a") || (editor && editor.type === "vim")) {
+      terminalPointerStart = null;
+      return;
+    }
+    terminalPointerStart = { x: e.clientX, y: e.clientY, pointerId: e.pointerId };
+  });
+  terminalWindow.addEventListener("pointerup", function (e) {
+    if (!terminalPointerStart || terminalPointerStart.pointerId !== e.pointerId) return;
+    var moved = Math.hypot(e.clientX - terminalPointerStart.x, e.clientY - terminalPointerStart.y);
+    terminalPointerStart = null;
+    var selection = window.getSelection();
+    if (moved > 4 || (selection && !selection.isCollapsed && selection.toString())) return;
+    terminalInput.focus();
+  });
+  terminalWindow.addEventListener("pointercancel", function () { terminalPointerStart = null; });
 
   terminalInput.addEventListener("keydown", function (e) {
     if (e.ctrlKey && e.key.toLowerCase() === "l") { e.preventDefault(); if (!editor || editor.type !== "vim") resetTerm(); return; }
@@ -616,10 +999,14 @@
   noteText.textContent = jokes[jokeIndex];
   if (window.matchMedia("(max-width: 920px)").matches) {
     windows.forEach(function (w) { w.classList.remove("active", "focused", "minimized"); });
-    openApp("terminal");
   }
+  var initialWindows = windows.filter(function (w) { return w.classList.contains("active"); });
+  initialWindows.forEach(function (w) { runningApps[w.getAttribute("data-app-window")] = true; });
+  if (window.matchMedia("(max-width: 920px)").matches) openApp("terminal");
+  else if (initialWindows.length) focus(initialWindows[initialWindows.length - 1]);
   clockTick(); setInterval(clockTick, 1000);
   makeNoteDraggable(desktopNote);
+  syncBrowserControls();
   syncDock();
   resetTerm();
   setPrompt();

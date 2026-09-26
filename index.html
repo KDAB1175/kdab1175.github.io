@@ -41,6 +41,10 @@
       <span class="icon-glyph terminal-glyph app-terminal">&gt;_</span>
       <span>Terminal</span>
     </button>
+    <button class="desktop-icon" data-app="browser" type="button">
+      <span class="icon-glyph app-browser">WEB</span>
+      <span>Browser</span>
+    </button>
     <button class="desktop-icon" data-app="resume" type="button">
       <span class="icon-glyph app-resume">CV</span>
       <span>Resume</span>
@@ -104,6 +108,31 @@
           <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" placeholder="help">
         </label>
       </div>
+    </div>
+  </section>
+
+  <section class="window" id="window-browser" data-app-window="browser" style="--x:12vw; --y:12vh; --w:min(980px, 96vw); --h:min(72vh, 720px);">
+    <div class="window-bar">
+      <div class="traffic">
+        <button class="dot close" data-close="browser" type="button" aria-label="Close"></button>
+        <button class="dot min" type="button" aria-label="Minimize"></button>
+        <button class="dot max" type="button" aria-label="Expand"></button>
+      </div>
+      <strong>Browser</strong>
+      <span class="meta">web.app</span>
+    </div>
+    <div class="window-content browser-content">
+      <form class="browser-toolbar" id="browser-form">
+        <button type="button" id="browser-back" aria-label="Back">←</button>
+        <button type="button" id="browser-forward" aria-label="Forward">→</button>
+        <button type="button" id="browser-reload" aria-label="Reload">↻</button>
+        <input id="browser-address" type="text" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Address or Google search" placeholder="Enter a URL or search Google">
+        <button type="submit">Go</button>
+        <button type="button" id="browser-home">Google</button>
+        <button type="button" id="browser-external">Open externally</button>
+      </form>
+      <p class="browser-notice" id="browser-notice">Enter a URL. Other text searches Google.</p>
+      <iframe id="browser-frame" title="Browser page" referrerpolicy="no-referrer" srcdoc="<!doctype html><html><body style='margin:0;display:grid;place-items:center;min-height:100vh;font-family:system-ui;background:#f5f8fc;color:#173452'><main style='text-align:center;padding:24px'><h1 style='margin:0 0 8px'>notamacOS Browser</h1><p style='margin:0'>Enter a URL or Google search above.</p></main></body></html>"></iframe>
     </div>
   </section>
 
@@ -234,6 +263,9 @@
     </button>
     <button type="button" class="dock-item app-terminal" data-app="terminal" aria-label="Terminal">
       <span>&gt;_</span>
+    </button>
+    <button type="button" class="dock-item app-browser" data-app="browser" aria-label="Browser">
+      <span>WEB</span>
     </button>
     <button type="button" class="dock-item app-resume" data-app="resume" aria-label="Resume">
       <span>CV</span>

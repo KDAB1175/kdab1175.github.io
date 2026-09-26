@@ -135,14 +135,14 @@
   }
   function initFs() {
     fsRoot.entries.Users = dir();
-    fsRoot.entries.Users.entries.albert = dir();
-    fsRoot.entries.Users.entries.albert.entries.Documents = dir();
-    fsRoot.entries.Users.entries.albert.entries.Projects = dir();
-    fsRoot.entries.Users.entries.albert.entries.Notes = dir();
-    write(["Users", "albert", "README.txt"], "notamacOS ephemeral filesystem.\nNothing persists after refresh.");
-    write(["Users", "albert", "Documents", "resume.txt"], "Put your resume highlights here.");
-    write(["Users", "albert", "Projects", "ideas.md"], "Project concepts and build notes.");
-    write(["Users", "albert", "Notes", "todo.txt"], "1) polish site\n2) ship");
+    fsRoot.entries.Users.entries.you = dir();
+    fsRoot.entries.Users.entries.you.entries.Documents = dir();
+    fsRoot.entries.Users.entries.you.entries.Projects = dir();
+    fsRoot.entries.Users.entries.you.entries.Notes = dir();
+    write(["Users", "you", "README.txt"], "notamacOS ephemeral filesystem.\nNothing persists after refresh.");
+    write(["Users", "you", "Documents", "resume.txt"], "Put your resume highlights here.");
+    write(["Users", "you", "Projects", "ideas.md"], "Project concepts and build notes.");
+    write(["Users", "you", "Notes", "todo.txt"], "1) polish site\n2) ship");
   }
 
   function addLine(text, className) {

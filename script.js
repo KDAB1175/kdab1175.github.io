@@ -45,6 +45,7 @@
   var browserHistoryIndex = -1;
   var browserBlockedMode = false;
   var browserHomepage = "https://merkurcorporation.com/magellan/";
+  var showingDesktop = false;
   var history = [];
   var historyIndex = -1;
   var log = [];
@@ -239,8 +240,31 @@
     });
     if (candidates.length) focus(candidates[0]); else blurWindows();
   }
+  function showDesktop() {
+    var visible = windows.filter(function (w) {
+      return w.classList.contains("active") && !w.classList.contains("minimized");
+    });
+    if (!visible.length) return;
+    showingDesktop = true;
+    visible.forEach(function (w) {
+      var rect = w.getBoundingClientRect();
+      var direction = rect.left + rect.width / 2 < window.innerWidth / 2 ? -1 : 1;
+      w.style.setProperty("--desktop-exit-x", direction * (window.innerWidth + rect.width) + "px");
+      w.classList.add("desktop-hidden");
+    });
+    document.body.classList.add("showing-desktop");
+    blurWindows();
+  }
+  function restoreDesktop(focusAfter) {
+    if (!showingDesktop) return;
+    showingDesktop = false;
+    document.body.classList.remove("showing-desktop");
+    windows.forEach(function (w) { w.classList.remove("desktop-hidden"); });
+    if (focusAfter !== false) focusNext(null);
+  }
   function openApp(app) {
     var w = getWindow(app); if (!w) return;
+    restoreDesktop(false);
     runningApps[app] = true;
     w.classList.add("active"); w.classList.remove("minimized");
     focus(w); syncDock();
@@ -873,6 +897,7 @@
   }
 
   document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && showingDesktop) { restoreDesktop(true); return; }
     if (e.key === "Escape" && dockContextMenu) { closeDockContextMenu(); return; }
     if (!editor || editor.type !== "vim") return;
     if (handleVimKey(e)) e.preventDefault();
@@ -917,11 +942,12 @@
       if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) { e.preventDefault(); openDockContextMenu(item); }
     });
   });
-  document.addEventListener("mousedown", function (e) {
+  document.addEventListener("click", function (e) {
     var target = e.target;
     if (dockContextMenu && !target.closest(".dock-context-menu") && !target.closest(".dock-item")) closeDockContextMenu();
     if (target.closest(".window, .dock, .menu-bar, .desktop-icon, .desktop-note, .dock-context-menu")) return;
-    blurWindows();
+    if (showingDesktop) restoreDesktop(true);
+    else showDesktop();
   });
   if (galleryShare) {
     galleryShare.addEventListener("click", function () {
